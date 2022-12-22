@@ -71,6 +71,10 @@ function draw() {
 */ 
 function Snake(segments) {
 	/* in te vullen */
+	this.straal = radius;
+	this.xCoordinaatMiddelpunt = x;
+	this.yCoordinaatMiddelpunt = y;
+	this.color = color;
 	}
 /**
    @constructor Element
@@ -81,10 +85,6 @@ function Snake(segments) {
 */ 
 function Element(radius, x, y, color) {
 		/* in te vullen */
-	this.straal = radius;
-	this.xCoordinaatMiddelpunt = x;
-	this.yCoordinaatMiddelpunt = y;
-	this.color = color;
 }
 /***************************************************************************
  **                 Hulpfuncties                                          **
