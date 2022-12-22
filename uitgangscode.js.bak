@@ -71,9 +71,6 @@ function draw() {
 */ 
 function Snake(segments) {
 	/* in te vullen */
-	this.head = segments[1];
-	this.tail = segments[0];
-	this.body = segments;
 	}
 /**
    @constructor Element
