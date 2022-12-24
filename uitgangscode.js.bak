@@ -158,7 +158,6 @@ function createFoods() {
    var  i = 0,    
         food;
    //we gebruiken een while omdat we, om een arraymethode te gebruiken, eerst een nieuw array zouden moeten creëren (met NUMFOODS elementen)
-   //food.collidesWithOneOf(snake.segments) MAKEN!!!!
    while (i < NUMFOODS ) {
      food = createFood(XMIN + getRandomInt(0, xMax), YMIN + getRandomInt(0, yMax));
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods) ) {
