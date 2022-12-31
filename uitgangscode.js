@@ -6,51 +6,63 @@ const R        = 10,          // straal van een element
       UP       = "up",
       DOWN     = "down",
 
-      NUMFOODS = 15,          // aantal voedselelementen       
+      NUMFOODS = 15,          // aantal voedselelementen 
 
-      XMIN     = R,           // minimale x waarde 
-      YMIN     = R,           // minimale y waarde 
-	  
-	  SLEEPTIME = 500,        // aantal milliseconde voor de timer
+      XMIN     = R,           // minimale x waarde
+      YMIN     = R,           // minimale y waarde
+      
+      SLEEPTIME = 500,        // aantal milliseconde voor de timer
 
-      SNAKE   = "DarkRed" ,   // kleur van een slangsegment
-      FOOD    = "Olive",       // kleur van voedsel
-	  HEAD    = "DarkOrange"   // kleur van de kop van de slang
-	
+      SNAKE   = "DarkRed",    // kleur van een slangsegment
+      FOOD    = "Olive",      // kleur van voedsel
+      HEAD    = "DarkOrange"; // kleur van de kop van de slang
+    
 var snake,
-    foods = [],                                // voedsel voor de slang
-	width,                    // breedte van het tekenveld
-	height,                   // hoogte van het tekenveld
-	xMax,                     // maximale waarde van x = width - R
-	ymax,                     // maximale waarde van y = height - R
-	direction = UP;
-	
-$(document).ready(function() {
-	$("#startSnake").click(init);  
-	$("#stopSnake").click(stop);
+    foods = [],               // voedsel voor de slang
+    width,                    // breedte van het tekenveld
+    height,                   // hoogte van het tekenveld
+    xMax = width - R,         // maximale waarde van x = width - R
+    ymax = height - R,        // maximale waarde van y = height - R
+    direction = UP;
+
+ /**
+$(document).ready(function () {
+    $("#startSnake").click(init);
+    $("#stopSnake").click(stop);
 });
+*/
 
 /**
   @function init() -> void
   @desc Haal eventueel bestaand voedsel en een bestaande slang weg, cre\"eer een slang, genereer voedsel, en teken alles
 */
-function init() {		
+function init() {
+    getDimensionsCanvas();
+    //snake moet eerst worden aangemaakt vóór food omdat deze op fixed positie komt te staan
+    createStartSnake();
+    createFood();
+    draw();
+}
+
+function getDimensionsCanvas() {
+    width = $("#mySnakeCanvas").width();
+    height = $("#mySnakeCanvas").height();
 }
 
 /**
   @function move(direction) -> void
   @desc Beweeg slang in aangegeven richting
-        tenzij slang uit canvas zou verdwijnen  
+        tenzij slang uit canvas zou verdwijnen 
   @param   {string} direction de richting (een van de constanten UP, DOWN, LEFT of RIGHT)
 */
 function move(direction) {
-	if (snake.canMove(direction)) {
-		snake.doMove(direction);
-		draw();
-	}
-	else {
-		console.log("snake cannot move " + direction);
-	}
+    if (snake.canMove(direction)) {
+        snake.doMove(direction);
+        draw();
+    }
+    else {
+        console.log("snake cannot move " + direction);
+    }
 }
 
 /**
@@ -58,9 +70,12 @@ function move(direction) {
   @desc Teken de slang en het voedsel
 */
 function draw() {
-	var canvas = $("#mySnakeCanvas").clearCanvas();
-	/* in te vullen */
+    //var canvas = $("#mySnakeCanvas").clearCanvas();
+    var canvas = $("#mySnakeCanvas");
+    drawElements(snake.segments, canvas);
+    drawElements(foods, canvas);
 }
+
 /***************************************************************************
  **                 Constructors                                          **
  ***************************************************************************/
@@ -70,9 +85,9 @@ function draw() {
                    Het laatste element van segments wordt de kop van de slang 
 */ 
 function Snake(segments) {
-	/* in te vullen */
-	this.snake = segments;
+    this.segments = segments;
 }
+
 /**
    @constructor Element
    @param radius straal
@@ -81,12 +96,38 @@ function Snake(segments) {
    @param {string} color kleur van het element
 */ 
 function Element(radius, x, y, color) {
-		/* in te vullen */
-	this.straal = radius;
-	this.xCoordinaatMiddelpunt = x;
-	this.yCoordinaatMiddelpunt = y;
-	this.kleur = color;
+    this.radius = radius;
+    this.x = x;
+    this.y = y;
+    this.color = color;
 }
+
+
+//volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
+//toevoegen documentatie nog nodig
+Element.prototype.collidesWithOneOf = function(elements) {
+    var xcoordinaat = this.x;
+    var ycoordinaat = this.y;
+    return elements.some(function(el) {
+        return xcoordinaat == el.x && ycoordinaat == el.y;
+    });
+}
+
+/**
+//volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
+//toevoegen documentatie nog nodig
+Element.prototype.collidesWithOneOf = function(elements) {
+    var xcoordinaat = this.x;
+    var ycoordinaat = this.y;
+    return elements.forEach(function(el) {
+        console.log("xcoordinaat: " + xcoordinaat + " el.x: " + el.x);
+        if (xcoordinaat == el.x && ycoordinaat == el.y) {
+            return true;
+        }
+        return false;
+    });
+}
+*/
 /***************************************************************************
  **                 Hulpfuncties                                          **
  ***************************************************************************/
@@ -98,10 +139,11 @@ function Element(radius, x, y, color) {
   @return: slang volgens specificaties
 */
 function createStartSnake() {
-	var segments   = [createSegment(R + width/2, R + height/2), 
-	                  createSegment(R + width/2, height/2 - R)];
+    var segments   = [createSegment(R + width/2, R + height/2), 
+                      createHead(R + width/2, height/2 - R)];
     snake = new Snake(segments);  
 }
+
 /**
   @function createSegment(x,y) -> Element
   @desc Slangsegment creeren op een bepaalde plaats
@@ -110,8 +152,20 @@ function createStartSnake() {
   @return: {Element} met straal R en color SNAKE
 */
 function createSegment(x, y) {
-	return new Element(R, x, y, SNAKE);
+    return new Element(R, x, y, SNAKE);
 }
+
+/**
+  @function createHead(x,y) -> Element
+  @desc Head slang creeren op een bepaalde plaats
+  @param {number} x x-coordinaat middelpunt
+  @param {number} y y-coordinaart middelpunt
+  @return: {Element} met straal R en color HEAD
+*/
+function createHead(x, y) {
+    return new Element(R, x, y, HEAD);
+}
+
 /**
   @function createFood(x,y) -> Element
   @desc Voedselelement creeren op een bepaalde plaats
@@ -120,8 +174,21 @@ function createSegment(x, y) {
   @return: {Element} met straal R en color FOOD
 */
 function createFood(x, y) {
-	return new Element(R, x, y, FOOD);
+    return new Element(R, x, y, FOOD);
 }
+
+/**
+  @function drawElements(elements, canvas) -> void
+  @desc Elementen tekenen
+  @param [Element] array van elementen
+  @param {dom object} canvas het tekenveld
+ */
+function drawElements(elements, canvas) {
+    elements.forEach(function (element) {
+        drawElement(element, canvas);
+    });
+}
+
 /**
   @function drawElement(element, canvas) -> void
   @desc Een element tekenen 
@@ -129,13 +196,13 @@ function createFood(x, y) {
   @param  {dom object} canvas het tekenveld
 */
  function drawElement(element, canvas) {
-	canvas.drawArc({
-		draggable : false,
-		fillStyle : element.color,
-		x : element.x,
-		y : element.y,
-		radius : element.radius
-	});
+    canvas.drawArc({
+        draggable : false,
+        fillStyle : element.color,
+        x : element.x,
+        y : element.y,
+        radius : element.radius
+    });
 }
 
 /**
@@ -146,7 +213,27 @@ function createFood(x, y) {
   @return {number} een random geheel getal x waarvoor geldt: min <= x <= max
 */
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+    var res;
+    if (isPosInteger(min) && isPosInteger(max) && min <= max) {
+        res = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    else if(!(isPosInteger(min) && isPosInteger(max))) {
+        throw Error("Het moeten gehele getallen van 0 of groter zijn");
+    }
+    else {
+        throw Error("Het eerste argument moet kleiner of gelijk aan het tweede argument zijn")
+    }
+    return res;
+}
+
+/**
+  @function isPosInteger(x: number) -> boolean
+  @desc Bepalen of het gaat om een positief geheel getal
+  @param {number} een getal
+  @return {boolean} true of false waarde
+*/
+function isPosInteger(x) {
+    return x >= 0 && Number.isInteger(x);
 }
 
 /**

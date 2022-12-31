@@ -8,6 +8,8 @@
 		<meta name="keywords" content="snake, boter-kaas-eieren, sudoku, master mind, galgje, cryptogrammen" />
 		<link rel="stylesheet" href="reset.css" />
 		<link rel="stylesheet" href="stijl.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+		<script src="uitgangscode.js"></script>
 	</head>
 	<body>
 		<div class="page">
@@ -32,8 +34,8 @@
 			<article>
 				<h2>Snake</h2>
 				<section>
-					<input type="submit" class="button" value="Start" />
-					<input type="submit" class="button" value="Stop" />
+					<input id="startSnake" type="submit" class="button" value="Start" />
+					<input id="stopSnake" type="submit" class="button" value="Stop" />
 				</section>
 				<canvas id="mySnakeCanvas" width="450" height="450"></canvas>
 			</article>
