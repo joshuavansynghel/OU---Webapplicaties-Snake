@@ -130,6 +130,9 @@ QUnit.test( "test createFood",
 		assert.equal(food.x, 30, "x coordinaat moet gelijk zijn aan 30");
 		assert.equal(food.y, 60, "y coordinaat moet gelijkj zijn aan 60");
 		assert.equal(food.color, FOOD, "kleur moet gelijk zijn aan constante FOOD");
+
+		var food2 = createFood(0 + getRandomInt(0, 450), YMIN + getRandomInt(0, 450));
+		console.log("test createfood: food x" + food2.x + "food y " + food2.y);
 });
 
 QUnit.test( "test isPosInteger met geldige waarden",
@@ -196,12 +199,15 @@ QUnit.test( "test getRandomInt met ongeldige waarden",
 
 QUnit.test( "test createFood", 
 	function ( assert ) {
+		//width = 400;
+		//height = 400;
+		createStartSnake();
 		createFoods();
 		assert.expect(2);
 		assert.equal(foods.length, NUMFOODS, "aantal foods moet gelijk zijn aan constante NUMFOODS");
 		assert.equal(foods.forEach(collidesWithOneOf(foods)), false, 
 			"geen enkel food mag een collision opleveren met een ander stuk food");
-		createStartSnake();
+		
 		assert.equal(foods.forEach(collidesWithOneOf(snake.segments)), false,
 			"geen enkel food mag een collision opleveren met segment van de slang");
 });
