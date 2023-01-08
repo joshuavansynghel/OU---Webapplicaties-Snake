@@ -11,5 +11,11 @@
       <script src="https://code.jquery.com/qunit/qunit-2.10.1.js"></script>
       <script src="uitgangscode.js"></script>
       <script src="testuitgangscode.js"></script>
+      <!-- from section to canvas is needed for testing javascript and can be deleted afterwards -->
+      <section>
+         <input id="startSnake" type="submit" class="button" value="Start" hidden="hidden"/>
+         <input id="stopSnake" type="submit" class="button" value="Stop" hidden="hidden"/>
+      </section>
+      <canvas id="mySnakeCanvas" width="450" height="450"></canvas>
    </body>
 </html>

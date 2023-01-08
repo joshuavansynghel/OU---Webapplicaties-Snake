@@ -21,16 +21,24 @@ var snake,
     foods = [],               // voedsel voor de slang
     width,                    // breedte van het tekenveld
     height,                   // hoogte van het tekenveld
-    xMax = width - R,         // maximale waarde van x = width - R
-    ymax = height - R,        // maximale waarde van y = height - R
+
+    /*
+    deze variabelen zijn afhankelijk van width en height die pas waarde krijgen na getDimensionsCanvas
+    wanneer krijgen deze variabelen hun waarde? moet getest worden 
+    */
+    xMax = 440,
+    yMax = 440,
+    //xMax = width - R,         // maximale waarde van x = width - R
+    //ymax = height - R,        // maximale waarde van y = height - R
+
     direction = UP;
 
- /**
+
 $(document).ready(function () {
     $("#startSnake").click(init);
     $("#stopSnake").click(stop);
 });
-*/
+
 
 /**
   @function init() -> void
@@ -40,13 +48,44 @@ function init() {
     getDimensionsCanvas();
     //snake moet eerst worden aangemaakt vóór food omdat deze op fixed positie komt te staan
     createStartSnake();
-    createFood();
+    createFoods();
     draw();
+
+    //dit doet snake bewegen maar moet nog mooier verpakt worden
+    setInterval(function() {
+    move();}, SLEEPTIME);
 }
+
+/*
+//deze code komt vanuit opdracht 2
+snakeTimer = setInterval(function() {
+move();}, SLEEPTIME);
+**/
+
+/**
+//dit stuk code zorgt voor de eventlisteren van het keyboard
+//code werd verkregen van Laurens
+window.addEventListener("keydown", event => {
+         if (event.key == DOWN) { 
+             direction(); 
+            }}
+
+e = e || window.event;
+  if (e.keyCode === 38) {
+    console.log('up arrow pressed')
+  } else if (e.keyCode === 40) {
+    console.log('down arrow pressed')
+  } else if (e.keyCode === 37) {
+    console.log('left arrow pressed')
+  } else if (e.keyCode === 39) {
+    console.log('right arrow pressed')
+  }
+*/
 
 function getDimensionsCanvas() {
     width = $("#mySnakeCanvas").width();
     height = $("#mySnakeCanvas").height();
+    console.log("snakeCanvaswidth: " + width + " and snakeCanvasheight: " + height);
 }
 
 /**
@@ -56,13 +95,17 @@ function getDimensionsCanvas() {
   @param   {string} direction de richting (een van de constanten UP, DOWN, LEFT of RIGHT)
 */
 function move(direction) {
-    if (snake.canMove(direction)) {
-        snake.doMove(direction);
+    //canMove en doMove moeten worden geschreven als methode van de klasse snake
+    //if (snake.canMove(direction)) {
+        //snake.doMove(direction);
+        updateSnakeCoordinaten();
         draw();
-    }
+    /**
+      }
     else {
         console.log("snake cannot move " + direction);
-    }
+      }
+    */
 }
 
 /**
@@ -70,10 +113,23 @@ function move(direction) {
   @desc Teken de slang en het voedsel
 */
 function draw() {
-    //var canvas = $("#mySnakeCanvas").clearCanvas();
-    var canvas = $("#mySnakeCanvas");
+    var canvas = $("#mySnakeCanvas").clearCanvas();
+    //var canvas = $("#mySnakeCanvas");
+    //console.log("canvas width: " + canvas.width + " and canvas height: " + canvas.height);
     drawElements(snake.segments, canvas);
     drawElements(foods, canvas);
+
+}
+
+function updateCanvas() {
+    updateSnakeCoordinaten();
+}
+
+function updateSnakeCoordinaten() {
+    snake.segments.forEach((segment) => {
+        console.log("segment x: " + segment.x);
+        segment.x += 20;
+    });
 }
 
 /***************************************************************************
@@ -109,7 +165,8 @@ Element.prototype.collidesWithOneOf = function(elements) {
     var xcoordinaat = this.x;
     var ycoordinaat = this.y;
     return elements.some(function(el) {
-        return xcoordinaat == el.x && ycoordinaat == el.y;
+        return xcoordinaat < el.x - 2 * R && xcoordinaat > el.x + 2 * R && 
+            ycoordinaat < el.y - 2 * R && ycoordinaat > el.y + 2 * R;
     });
 }
 
@@ -141,7 +198,9 @@ Element.prototype.collidesWithOneOf = function(elements) {
 function createStartSnake() {
     var segments   = [createSegment(R + width/2, R + height/2), 
                       createHead(R + width/2, height/2 - R)];
-    snake = new Snake(segments);  
+    snake = new Snake(segments);
+    console.log("Snake first segment x: " + snake.segments[0].x + " and snake first segment y: " + snake.segments[0].y);
+    console.log("Snake second segment x: " + snake.segments[1].x + " and snake second segment y: " + snake.segments[1].y);  
 }
 
 /**
@@ -246,9 +305,17 @@ function createFoods() {
         food;
    //we gebruiken een while omdat we, om een arraymethode te gebruiken, eerst een nieuw array zouden moeten creëren (met NUMFOODS elementen)
    //food.collidesWithOneOf(snake.segments) MAKEN!!!!
+
+   //deze sectie is om code te testen en moet later verwijderd worden  
+   //getDimensionsCanvas();
+   createStartSnake();
+   //console.log("snake first segment x: " + snake.segments[0].x + " and snake first segment y: " + snake.segments[0].y);
+   //console.log("snake first segment x: " + snake.segments[1].x + " and snake first segment y: " + snake.segments[1].y);
+
    while (i < NUMFOODS ) {
      food = createFood(XMIN + getRandomInt(0, xMax), YMIN + getRandomInt(0, yMax));
-     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods) ) {
+     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
+       console.log("food x: " + food.x + " and food y: " + food.y);
        foods.push(food);
        i++
      }
