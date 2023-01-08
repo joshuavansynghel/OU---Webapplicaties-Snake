@@ -26,6 +26,7 @@ var snake,
     deze variabelen zijn afhankelijk van width en height die pas waarde krijgen na getDimensionsCanvas
     wanneer krijgen deze variabelen hun waarde? moet getest worden 
     */
+    //deze variabelen tijdelijk een fixed waarde toegekend van canvas width - R
     xMax = 440,
     yMax = 440,
     //xMax = width - R,         // maximale waarde van x = width - R
