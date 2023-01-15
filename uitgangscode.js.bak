@@ -219,8 +219,7 @@ function verloren() {
 function drawVerloren() {
 	$("#mySnakeCanvas").drawImage({
 	source: 'sad_snake.jpg',
-	x: 210, y: 240,
-	scale : 0.5
+	x: 210, y: 240
 	});
 }
 
