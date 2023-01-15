@@ -6,12 +6,13 @@ const R        = 10,          // straal van een element
       UP       = "up",
       DOWN     = "down",
 
-      NUMFOODS = 15,          // aantal voedselelementen 
+
+      NUMFOODS = 30,          // aantal voedselelementen 
 
       XMIN     = R,           // minimale x waarde
       YMIN     = R,           // minimale y waarde
       
-      SLEEPTIME = 500,        // aantal milliseconde voor de timer
+      SLEEPTIME = 200,        // aantal milliseconde voor de timer
 
       SNAKE   = "DarkRed",    // kleur van een slangsegment
       FOOD    = "Olive",      // kleur van voedsel
@@ -21,6 +22,13 @@ var snake,
     foods = [],               // voedsel voor de slang
     width,                    // breedte van het tekenveld
     height,                   // hoogte van het tekenveld
+	snaketimer,				  // (Laurens) timer van de snake
+	spelGestart = false,
+	direction = UP,	
+	switchDirection = UP;
+	
+	coordinaten = [10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290, 310, 330, 350, 370, 390, 410, 430, 450];
+	// boolean waarde geeft aan of spel is begonnen 
 
     /*
     deze variabelen zijn afhankelijk van width en height die pas waarde krijgen na getDimensionsCanvas
@@ -40,22 +48,65 @@ $(document).ready(function () {
     $("#stopSnake").click(stop);
 });
 
+$(document).keydown(function (e) {
+	switch (e.which) {
+	case 37: // left
+	switchDirection = LEFT;
+	break;
+	case 38: // up
+	switchDirection = UP;
+	break;
+	case 39: // right
+	switchDirection = RIGHT;
+	break;
+	case 40: // down
+	switchDirection = DOWN;
+	break;
+}
+});
+
+/**
+$(document).keydown(function(event){
+         current
+		 if (event.keyCode == 38) { 
+             stop(); 
+            }
+		});
+*/
 
 /**
   @function init() -> void
   @desc Haal eventueel bestaand voedsel en een bestaande slang weg, cre\"eer een slang, genereer voedsel, en teken alles
 */
 function init() {
-    getDimensionsCanvas();
-    //snake moet eerst worden aangemaakt vóór food omdat deze op fixed positie komt te staan
+    if(spelGestart == false) { 
+	setSpelGestart(true);
+	getDimensionsCanvas();
     createStartSnake();
     createFoods();
     draw();
-
-    //dit doet snake bewegen maar moet nog mooier verpakt worden
-    setInterval(function() {
+    snaketimer = setInterval(function() {
     move();}, SLEEPTIME);
+	} 
 }
+
+//(Laurens) stopfunctie
+ function stop() { 
+  resetCanvas();
+} 
+ //(Laurens) resetfunctie
+function resetCanvas() { 
+  $("#mySnakeCanvas").clearCanvas(); 
+  clearInterval(snaketimer);
+  foods = [];
+  setSpelGestart(false);
+  direction = UP;	
+  switchDirection = UP;
+} 
+
+function setSpelGestart(gestart) {
+	spelGestart = gestart;
+} 
 
 /*
 //deze code komt vanuit opdracht 2
@@ -63,25 +114,6 @@ snakeTimer = setInterval(function() {
 move();}, SLEEPTIME);
 **/
 
-/**
-//dit stuk code zorgt voor de eventlisteren van het keyboard
-//code werd verkregen van Laurens
-window.addEventListener("keydown", event => {
-         if (event.key == DOWN) { 
-             direction(); 
-            }}
-
-e = e || window.event;
-  if (e.keyCode === 38) {
-    console.log('up arrow pressed')
-  } else if (e.keyCode === 40) {
-    console.log('down arrow pressed')
-  } else if (e.keyCode === 37) {
-    console.log('left arrow pressed')
-  } else if (e.keyCode === 39) {
-    console.log('right arrow pressed')
-  }
-*/
 
 function getDimensionsCanvas() {
     width = $("#mySnakeCanvas").width();
@@ -95,19 +127,24 @@ function getDimensionsCanvas() {
         tenzij slang uit canvas zou verdwijnen 
   @param   {string} direction de richting (een van de constanten UP, DOWN, LEFT of RIGHT)
 */
-function move(direction) {
-    //canMove en doMove moeten worden geschreven als methode van de klasse snake
+function move() {
+	//canMove en doMove moeten worden geschreven als methode van de klasse snake
     //if (snake.canMove(direction)) {
         //snake.doMove(direction);
-        updateSnakeCoordinaten();
-        draw();
+       determineDirection();
+	   newHead = calculateHead();
+	   if(!newHead.collidesWithOneOf(snake.segments)) {
+	   foodCollision = newHead.collidesWithOneOf(foods);
+	   updateSnakeCoordinaten(newHead, foodCollision);
+       draw();
+	   } else {verloren();} //resetCanvas();
+}
     /**
       }
     else {
         console.log("snake cannot move " + direction);
       }
     */
-}
 
 /**
   @function draw() -> void
@@ -115,23 +152,78 @@ function move(direction) {
 */
 function draw() {
     var canvas = $("#mySnakeCanvas").clearCanvas();
-    //var canvas = $("#mySnakeCanvas");
-    //console.log("canvas width: " + canvas.width + " and canvas height: " + canvas.height);
     drawElements(snake.segments, canvas);
     drawElements(foods, canvas);
 
 }
 
-function updateCanvas() {
-    updateSnakeCoordinaten();
+
+
+/** function updateSnakeCoordinaten() {
+    snake.segments.forEach((segment) => {
+        //console.log("segment x: " + segment.x);
+        segment.x;
+    });
+*/
+function determineDirection() {
+	if(direction == UP && switchDirection == DOWN)  { 
+		direction = UP;
+	}
+	else if(direction ==  RIGHT && switchDirection == LEFT)  { 
+		direction =  RIGHT;
+	}
+	else if(direction == LEFT && switchDirection ==  RIGHT)  { 
+		direction = LEFT;
+	}
+	else if(direction == DOWN && switchDirection == UP)  { 
+		direction = DOWN;
+	} else {direction = switchDirection}
+} 
+
+function calculateHead() { 
+	let snakeHead = snake.segments[0];
+	let newHead;
+	if(direction == UP) {
+		let y = snake.segments[0].y - (2*R);
+		if(y < 10) {y = 450;}
+		newHead = createHead(snake.segments[0].x, y);
+	}
+	else if(direction == DOWN) {
+		newHead = createHead(snake.segments[0].x, (snake.segments[0].y + (2*R)) % 460);
+	}
+	else if(direction == LEFT) {
+		let x = snake.segments[0].x - (2*R);
+		if(x < 10) {x = 450;}
+		newHead = createHead(x, snake.segments[0].y);
+	}
+	else if(direction == RIGHT) {
+		newHead = createHead((snake.segments[0].x + (2*R)) % 460, snake.segments[0].y);
+	} else {newHead = snakeHead;}
+	return newHead;
+	
+} 
+
+function updateSnakeCoordinaten(newHead, foodCollision) {
+	snake.segments[0].color = SNAKE;
+	snake.segments.unshift(newHead);
+	if(!foodCollision) {
+		snake.segments.pop();
+		} else {removeFood(newHead.x, newHead.y);}
 }
 
-function updateSnakeCoordinaten() {
-    snake.segments.forEach((segment) => {
-        console.log("segment x: " + segment.x);
-        segment.x += 20;
-    });
+function verloren() {
+	resetCanvas();
+	drawVerloren();
 }
+
+function drawVerloren() {
+	$("#mySnakeCanvas").drawImage({
+	source: 'sad_snake.jpg',
+	x: 210, y: 240,
+	scale : 0.5
+	});
+}
+
 
 /***************************************************************************
  **                 Constructors                                          **
@@ -159,33 +251,24 @@ function Element(radius, x, y, color) {
     this.color = color;
 }
 
-
 //volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
 //toevoegen documentatie nog nodig
 Element.prototype.collidesWithOneOf = function(elements) {
     var xcoordinaat = this.x;
     var ycoordinaat = this.y;
     return elements.some(function(el) {
-        return xcoordinaat < el.x - 2 * R && xcoordinaat > el.x + 2 * R && 
-            ycoordinaat < el.y - 2 * R && ycoordinaat > el.y + 2 * R;
+        return xcoordinaat == el.x && ycoordinaat == el.y;
     });
 }
 
-/**
-//volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
-//toevoegen documentatie nog nodig
-Element.prototype.collidesWithOneOf = function(elements) {
-    var xcoordinaat = this.x;
-    var ycoordinaat = this.y;
-    return elements.forEach(function(el) {
-        console.log("xcoordinaat: " + xcoordinaat + " el.x: " + el.x);
-        if (xcoordinaat == el.x && ycoordinaat == el.y) {
-            return true;
-        }
-        return false;
-    });
-}
-*/
+function removeFood(x,y) { 
+    for(var i = 0; i < foods.length; i++){ 
+        if (foods[i].x == x && foods[i].y == y) { 
+            foods.splice(i, 1); 
+        } 
+	} 
+} 
+
 /***************************************************************************
  **                 Hulpfuncties                                          **
  ***************************************************************************/
@@ -196,14 +279,14 @@ Element.prototype.collidesWithOneOf = function(elements) {
         in het midden van het veld
   @return: slang volgens specificaties
 */
-function createStartSnake() {
-    var segments   = [createSegment(R + width/2, R + height/2), 
-                      createHead(R + width/2, height/2 - R)];
-    snake = new Snake(segments);
-    console.log("Snake first segment x: " + snake.segments[0].x + " and snake first segment y: " + snake.segments[0].y);
-    console.log("Snake second segment x: " + snake.segments[1].x + " and snake second segment y: " + snake.segments[1].y);  
-}
 
+
+
+function createStartSnake() {
+	var segments   = [createHead(10 - R + width/2, height/2 - R - 10),  createSegment(10 - R + width/2, R + height/2 - 10) ];
+    snake = new Snake(segments);
+	} 
+	
 /**
   @function createSegment(x,y) -> Element
   @desc Slangsegment creeren op een bepaalde plaats
@@ -304,22 +387,17 @@ function isPosInteger(x) {
 function createFoods() {   
    var  i = 0,    
         food;
-   //we gebruiken een while omdat we, om een arraymethode te gebruiken, eerst een nieuw array zouden moeten creëren (met NUMFOODS elementen)
-   //food.collidesWithOneOf(snake.segments) MAKEN!!!!
-
-   //deze sectie is om code te testen en moet later verwijderd worden  
-   //getDimensionsCanvas();
-   createStartSnake();
-   //console.log("snake first segment x: " + snake.segments[0].x + " and snake first segment y: " + snake.segments[0].y);
-   //console.log("snake first segment x: " + snake.segments[1].x + " and snake first segment y: " + snake.segments[1].y);
-
    while (i < NUMFOODS ) {
-     food = createFood(XMIN + getRandomInt(0, xMax), YMIN + getRandomInt(0, yMax));
+     food = createFood(coordinaten[getRandomInt(0, coordinaten.length - 1)], coordinaten[getRandomInt(0, coordinaten.length - 1)]);
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
        console.log("food x: " + food.x + " and food y: " + food.y);
        foods.push(food);
        i++
      }
    }  
+   
+
+   
+   
 }
 
