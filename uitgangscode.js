@@ -22,104 +22,112 @@ var snake,
     foods = [],               // voedsel voor de slang
     width,                    // breedte van het tekenveld
     height,                   // hoogte van het tekenveld
-	snaketimer,				  // (Laurens) timer van de snake
-	spelGestart = false,
-	direction = UP,	
-	switchDirection = UP;
-	
-	coordinaten = [10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290, 310, 330, 350, 370, 390, 410, 430, 450];
-	// boolean waarde geeft aan of spel is begonnen 
+    snaketimer,               // (Laurens) timer van de snake
+    spelGestart = false,
 
-    /*
-    deze variabelen zijn afhankelijk van width en height die pas waarde krijgen na getDimensionsCanvas
-    wanneer krijgen deze variabelen hun waarde? moet getest worden 
-    */
+    
     //deze variabelen tijdelijk een fixed waarde toegekend van canvas width - R
-    xMax = 440,
-    yMax = 440,
+    //xMax = 440,
+    //yMax = 440,
+
+    xMax,
+    yMax,
     //xMax = width - R,         // maximale waarde van x = width - R
     //ymax = height - R,        // maximale waarde van y = height - R
 
-    direction = UP;
+    direction = UP,
+    switchDirection = UP;
 
+$(document).keydown(function (e) {
+    switch (e.code) {
+    case "ArrowLeft":
+       switchDirection = LEFT;
+       break;
+    case "ArrowUp":
+       switchDirection = UP;
+       break;
+    case "ArrowRight":
+       switchDirection = RIGHT;
+       break;
+    case "ArrowDown":
+       switchDirection = DOWN;
+       break;
+    }
+});
 
 $(document).ready(function () {
+    prepareCanvas();
     $("#startSnake").click(init);
     $("#stopSnake").click(stop);
 });
 
-$(document).keydown(function (e) {
-	switch (e.which) {
-	case 37: // left
-	switchDirection = LEFT;
-	break;
-	case 38: // up
-	switchDirection = UP;
-	break;
-	case 39: // right
-	switchDirection = RIGHT;
-	break;
-	case 40: // down
-	switchDirection = DOWN;
-	break;
+
+function prepareCanvas() {
+    getDimensionsCanvas();
+    //indien hoogte of breedte niet deelbaar is door 2 R dient het canvas
+    //nieuwe afmetingen te krijgen om de elementen mooi af te kunnen beelden
+    if (width % (2 * R) != 0 ||
+        height % (2 * R) != 0) {
+
+        var newSize = furthestCoordinateElementCanHave(width);
+        console.log("newSize: " + newSize);
+
+        //pas nieuwe afmetingen toe op canvas en sla deze afmetingen op in variabelen
+        $("#mySnakeCanvas").width(newSize);
+        $("#mySnakeCanvas").height(newSize);
+        getDimensionsCanvas();
+    }
+    //toekennen van max coordinaat element kan hebben
+    xMax = width - R;
+    yMax = height - R
+    console.log("xMax: " + xMax + " en yMax:" + yMax);
 }
-});
 
 /**
-$(document).keydown(function(event){
-         current
-		 if (event.keyCode == 38) { 
-             stop(); 
-            }
-		});
+  @function getDimensionsCanvas() -> void
+  @desc haal de hoogte en wijdte van het canvas op via het DOM-object
 */
-
-/**
-  @function init() -> void
-  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, cre\"eer een slang, genereer voedsel, en teken alles
-*/
-function init() {
-    if(spelGestart == false) { 
-	setSpelGestart(true);
-	getDimensionsCanvas();
-    createStartSnake();
-    createFoods();
-    draw();
-    snaketimer = setInterval(function() {
-    move();}, SLEEPTIME);
-	} 
+function getDimensionsCanvas() {
+    width = $("#mySnakeCanvas").width();
+    height = $("#mySnakeCanvas").height();
 }
 
 //(Laurens) stopfunctie
- function stop() { 
-  resetCanvas();
+function stop() { 
+  resetGame();
 } 
+
  //(Laurens) resetfunctie
-function resetCanvas() { 
+function resetGame() { 
   $("#mySnakeCanvas").clearCanvas(); 
   clearInterval(snaketimer);
   foods = [];
   setSpelGestart(false);
-  direction = UP;	
+  direction = UP;   
   switchDirection = UP;
 } 
 
-function setSpelGestart(gestart) {
-	spelGestart = gestart;
-} 
-
-/*
-//deze code komt vanuit opdracht 2
-snakeTimer = setInterval(function() {
-move();}, SLEEPTIME);
-**/
-
-
-function getDimensionsCanvas() {
-    width = $("#mySnakeCanvas").width();
-    height = $("#mySnakeCanvas").height();
-    console.log("snakeCanvaswidth: " + width + " and snakeCanvasheight: " + height);
+/**
+  @function init() -> void
+  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, 
+        cre\"eer een slang, genereer voedsel, en teken alles
+*/
+function init() {
+    if(spelGestart == false) { 
+        setSpelGestart(true);
+        // wordt al aangeroepen in prepareCanvas getDimensionsCanvas();
+        createStartSnake();
+        createFoods();
+        draw();
+        snaketimer = setInterval(function() {
+            move();}, SLEEPTIME);
+    } 
 }
+
+
+function setSpelGestart(gestart) {
+    spelGestart = gestart;
+} 
 
 /**
   @function move(direction) -> void
@@ -128,23 +136,21 @@ function getDimensionsCanvas() {
   @param   {string} direction de richting (een van de constanten UP, DOWN, LEFT of RIGHT)
 */
 function move() {
-	//canMove en doMove moeten worden geschreven als methode van de klasse snake
+    //canMove en doMove moeten worden geschreven als methode van de klasse snake
     //if (snake.canMove(direction)) {
-        //snake.doMove(direction);
-       determineDirection();
-	   newHead = calculateHead();
-	   if(!newHead.collidesWithOneOf(snake.segments)) {
-	   foodCollision = newHead.collidesWithOneOf(foods);
-	   updateSnakeCoordinaten(newHead, foodCollision);
+    //snake.doMove(direction);
+    
+    determineDirection();
+    newHead = calculateHead();
+    if(!newHead.collidesWithOneOf(snake.segments)) {
+       foodCollision = newHead.collidesWithOneOf(foods);
+       updateSnakeCoordinaten(newHead, foodCollision);
        draw();
-	   } else {verloren();} //resetCanvas();
+    } else {
+       verloren();
+    }
 }
-    /**
-      }
-    else {
-        console.log("snake cannot move " + direction);
-      }
-    */
+
 
 /**
   @function draw() -> void
@@ -154,75 +160,79 @@ function draw() {
     var canvas = $("#mySnakeCanvas").clearCanvas();
     drawElements(snake.segments, canvas);
     drawElements(foods, canvas);
-
 }
 
 
-
-/** function updateSnakeCoordinaten() {
-    snake.segments.forEach((segment) => {
-        //console.log("segment x: " + segment.x);
-        segment.x;
-    });
-*/
 function determineDirection() {
-	if(direction == UP && switchDirection == DOWN)  { 
-		direction = UP;
-	}
-	else if(direction ==  RIGHT && switchDirection == LEFT)  { 
-		direction =  RIGHT;
-	}
-	else if(direction == LEFT && switchDirection ==  RIGHT)  { 
-		direction = LEFT;
-	}
-	else if(direction == DOWN && switchDirection == UP)  { 
-		direction = DOWN;
-	} else {direction = switchDirection}
+    if (!oppositeDirectionSnake()) { 
+        direction = switchDirection;
+    }
 } 
 
+function oppositeDirectionSnake() {
+    return (direction == UP && switchDirection == DOWN) ||
+            (direction == DOWN && switchDirection == UP) ||
+            (direction == LEFT && switchDirection == RIGHT) ||
+            (direction == RIGHT && switchDirection == LEFT);
+}
+
 function calculateHead() { 
-	let snakeHead = snake.segments[0];
-	let newHead;
-	if(direction == UP) {
-		let y = snake.segments[0].y - (2*R);
-		if(y < 10) {y = 450;}
-		newHead = createHead(snake.segments[0].x, y);
-	}
-	else if(direction == DOWN) {
-		newHead = createHead(snake.segments[0].x, (snake.segments[0].y + (2*R)) % 460);
-	}
-	else if(direction == LEFT) {
-		let x = snake.segments[0].x - (2*R);
-		if(x < 10) {x = 450;}
-		newHead = createHead(x, snake.segments[0].y);
-	}
-	else if(direction == RIGHT) {
-		newHead = createHead((snake.segments[0].x + (2*R)) % 460, snake.segments[0].y);
-	} else {newHead = snakeHead;}
-	return newHead;
-	
+    let snakeHead = snake.segments[0];
+    let newHead;
+    if(direction == UP) {
+        let y = snake.segments[0].y - (2*R);
+        if(y < 10) {y = 450;}
+        newHead = createHead(snake.segments[0].x, y);
+    }
+    else if(direction == DOWN) {
+        newHead = createHead(snake.segments[0].x, (snake.segments[0].y + (2*R)) % 460);
+    }
+    else if(direction == LEFT) {
+        let x = snake.segments[0].x - (2*R);
+        if(x < 10) {x = 450;}
+        newHead = createHead(x, snake.segments[0].y);
+    }
+    else if(direction == RIGHT) {
+        newHead = createHead((snake.segments[0].x + (2*R)) % 460, snake.segments[0].y);
+    } else {newHead = snakeHead;}
+    return newHead;
+    
 } 
 
 function updateSnakeCoordinaten(newHead, foodCollision) {
-	snake.segments[0].color = SNAKE;
-	snake.segments.unshift(newHead);
-	if(!foodCollision) {
-		snake.segments.pop();
-		} else {removeFood(newHead.x, newHead.y);}
+    snake.segments[0].color = SNAKE;
+    snake.segments.unshift(newHead);
+    if(!foodCollision) {
+        snake.segments.pop();
+    } else {
+        removeFood(newHead.x, newHead.y);
+    }
 }
 
+
+function removeFood(x,y) {
+    //ga alle elementen af in de array foods 
+    for(var i = 0; i < foods.length; i++){
+        //verwijder voedsel dat op de meegegeven coordinaten staat
+        if (foods[i].x == x && foods[i].y == y) { 
+            foods.splice(i, 1); 
+        } 
+    } 
+} 
+
 function verloren() {
-	resetCanvas();
-	drawVerloren();
+    resetCanvas();
+    drawVerloren();
 }
 
 function drawVerloren() {
-	$("#mySnakeCanvas").drawImage({
-	source: 'sad_snake.jpg',
-	x: 210, y: 240,
-	scale : 0.5
-	});
+    $("#mySnakeCanvas").drawImage({
+    source: 'sad_snake.jpg',
+    x: 210, y: 240,
+    scale : 0.5
+    });
 }
+
 
 
 /***************************************************************************
@@ -251,8 +261,6 @@ function Element(radius, x, y, color) {
     this.color = color;
 }
 
-//volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
-//toevoegen documentatie nog nodig
 Element.prototype.collidesWithOneOf = function(elements) {
     var xcoordinaat = this.x;
     var ycoordinaat = this.y;
@@ -261,13 +269,6 @@ Element.prototype.collidesWithOneOf = function(elements) {
     });
 }
 
-function removeFood(x,y) { 
-    for(var i = 0; i < foods.length; i++){ 
-        if (foods[i].x == x && foods[i].y == y) { 
-            foods.splice(i, 1); 
-        } 
-	} 
-} 
 
 /***************************************************************************
  **                 Hulpfuncties                                          **
@@ -279,14 +280,12 @@ function removeFood(x,y) {
         in het midden van het veld
   @return: slang volgens specificaties
 */
-
-
-
 function createStartSnake() {
-	var segments   = [createHead(10 - R + width/2, height/2 - R - 10),  createSegment(10 - R + width/2, R + height/2 - 10) ];
+    var segments   = [createHead(10 - R + width/2, height/2 - R - 10),
+                    createSegment(10 - R + width/2, R + height/2 - 10) ];
     snake = new Snake(segments);
-	} 
-	
+    } 
+    
 /**
   @function createSegment(x,y) -> Element
   @desc Slangsegment creeren op een bepaalde plaats
@@ -349,6 +348,43 @@ function drawElements(elements, canvas) {
 }
 
 /**
+  @function createFoods() -> array met food
+  @desc [Element] array van random verdeelde voedselpartikelen
+  @return [Element] array met food
+*/
+function createFoods() {   
+   var  i = 0,    
+        food;
+   while (i < NUMFOODS ) {
+     food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), YMIN + getRandomMultipleOfRadius(0, yMax));
+     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
+       foods.push(food);
+       i++
+     }
+   }  
+}
+
+/**
+  @function getRandomMultipeOfRadius(min: number, max: number) -> number
+  @desc Creeren van random veelvoud van het dubbele van de radius in het interval [min, max]
+  @param {number} min een geheel getal als onderste grenswaarde
+  @param {number} max een geheel getal als bovenste grenswaarde (max > min)
+  @return {number} een random geheel getal x waarvoor geldt: min <= x <= max && (x % (2*R)) = 0
+*/
+function getRandomMultipleOfRadius(min, max) {
+    //het einderesultaat is het maximum x of y coordinaat dat 
+    //een element kan hebben om toch binnen het canvas te blijven
+    var res = getRandomInt(min, furthestCoordinateElementCanHave(max));
+    return res;
+}
+
+function furthestCoordinateElementCanHave(currentSize) {
+    var res = Math.floor(currentSize / (2 * R)) * 2 * R;
+    console.log("furthestCoordinateElementCanHave: " + res);    
+    return res;
+}
+
+/**
   @function getRandomInt(min: number, max: number) -> number
   @desc Creeren van random geheel getal in het interval [min, max] 
   @param {number} min een geheel getal als onderste grenswaarde
@@ -378,26 +414,3 @@ function getRandomInt(min, max) {
 function isPosInteger(x) {
     return x >= 0 && Number.isInteger(x);
 }
-
-/**
-  @function createFoods() -> array met food
-  @desc [Element] array van random verdeelde voedselpartikelen
-  @return [Element] array met food
-*/
-function createFoods() {   
-   var  i = 0,    
-        food;
-   while (i < NUMFOODS ) {
-     food = createFood(coordinaten[getRandomInt(0, coordinaten.length - 1)], coordinaten[getRandomInt(0, coordinaten.length - 1)]);
-     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
-       console.log("food x: " + food.x + " and food y: " + food.y);
-       foods.push(food);
-       i++
-     }
-   }  
-   
-
-   
-   
-}
-
