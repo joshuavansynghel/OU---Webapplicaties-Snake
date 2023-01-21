@@ -26,31 +26,30 @@ var snake,
     spelGestart = false,
 
     
-    //deze variabelen tijdelijk een fixed waarde toegekend van canvas width - R
-    //xMax = 440,
-    //yMax = 440,
-
     xMax,
-    yMax,
+    yMax
+
+    //xMax = 450,
+    //yMax = 450,
     //xMax = width - R,         // maximale waarde van x = width - R
     //ymax = height - R,        // maximale waarde van y = height - R
 
     direction = UP,
-    switchDirection = UP;
+    lastPressedKey = UP;
 
 $(document).keydown(function (e) {
     switch (e.code) {
     case "ArrowLeft":
-       switchDirection = LEFT;
+       lastPressedKey = LEFT;
        break;
     case "ArrowUp":
-       switchDirection = UP;
+       lastPressedKey = UP;
        break;
     case "ArrowRight":
-       switchDirection = RIGHT;
+       lastPressedKey = RIGHT;
        break;
     case "ArrowDown":
-       switchDirection = DOWN;
+       lastPressedKey = DOWN;
        break;
     }
 });
@@ -69,7 +68,7 @@ function prepareCanvas() {
     if (width % (2 * R) != 0 ||
         height % (2 * R) != 0) {
 
-        var newSize = furthestCoordinateElementCanHave(width);
+        var newSize = Math.floor(width / (2 * R)) * 2 * R;
         console.log("newSize: " + newSize);
 
         //pas nieuwe afmetingen toe op canvas en sla deze afmetingen op in variabelen
@@ -79,8 +78,8 @@ function prepareCanvas() {
     }
     //toekennen van max coordinaat element kan hebben
     xMax = width - R;
-    yMax = height - R
-    console.log("xMax: " + xMax + " en yMax:" + yMax);
+    yMax = height - R;
+    //console.log("xMax: " + xMax + " en yMax:" + yMax);
 }
 
 /**
@@ -88,8 +87,8 @@ function prepareCanvas() {
   @desc haal de hoogte en wijdte van het canvas op via het DOM-object
 */
 function getDimensionsCanvas() {
-    width = $("#mySnakeCanvas").width();
-    height = $("#mySnakeCanvas").height();
+    width = $("#mySnakeCanvas").innerWidth();
+    height = $("#mySnakeCanvas").innerHeight();
 }
 
 //(Laurens) stopfunctie
@@ -115,7 +114,8 @@ function resetGame() {
 function init() {
     if(spelGestart == false) { 
         setSpelGestart(true);
-        // wordt al aangeroepen in prepareCanvas getDimensionsCanvas();
+        // wordt al aangeroepen in prepareCanvas 
+        getDimensionsCanvas();
         createStartSnake();
         createFoods();
         draw();
@@ -170,10 +170,10 @@ function determineDirection() {
 } 
 
 function oppositeDirectionSnake() {
-    return (direction == UP && switchDirection == DOWN) ||
-            (direction == DOWN && switchDirection == UP) ||
-            (direction == LEFT && switchDirection == RIGHT) ||
-            (direction == RIGHT && switchDirection == LEFT);
+    return (direction == UP && lastPressedKey == DOWN) ||
+            (direction == DOWN && lastPressedKey == UP) ||
+            (direction == LEFT && lastPressedKey == RIGHT) ||
+            (direction == RIGHT && lastPressedKey == LEFT);
 }
 
 function calculateHead() { 
@@ -221,7 +221,7 @@ function removeFood(x,y) {
 } 
 
 function verloren() {
-    resetCanvas();
+    resetGame();
     drawVerloren();
 }
 
@@ -294,6 +294,7 @@ function createStartSnake() {
   @return: {Element} met straal R en color SNAKE
 */
 function createSegment(x, y) {
+    console.log("segmentx: " + x + " and segmenty:" + y);
     return new Element(R, x, y, SNAKE);
 }
 
@@ -359,6 +360,7 @@ function createFoods() {
      food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), YMIN + getRandomMultipleOfRadius(0, yMax));
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
        foods.push(food);
+       console.log("foodx: " + food.x + " and foody: " + food.y);
        i++
      }
    }  
@@ -372,15 +374,8 @@ function createFoods() {
   @return {number} een random geheel getal x waarvoor geldt: min <= x <= max && (x % (2*R)) = 0
 */
 function getRandomMultipleOfRadius(min, max) {
-    //het einderesultaat is het maximum x of y coordinaat dat 
-    //een element kan hebben om toch binnen het canvas te blijven
-    var res = getRandomInt(min, furthestCoordinateElementCanHave(max));
-    return res;
-}
-
-function furthestCoordinateElementCanHave(currentSize) {
-    var res = Math.floor(currentSize / (2 * R)) * 2 * R;
-    console.log("furthestCoordinateElementCanHave: " + res);    
+    var res;
+    res = getRandomInt(min, Math.floor(max / (2 * R))) * 2 * R;
     return res;
 }
 
