@@ -22,206 +22,283 @@ var snake,
     foods = [],               // voedsel voor de slang
     width,                    // breedte van het tekenveld
     height,                   // hoogte van het tekenveld
-	snaketimer,				  // (Laurens) timer van de snake
-	spelGestart = false,
-	direction = UP,	
-	switchDirection = UP;
-	
-	coordinaten = [10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290, 310, 330, 350, 370, 390, 410, 430, 450];
-	// boolean waarde geeft aan of spel is begonnen 
+    snaketimer,               // timer van de snake
+    spelGestart = false,      // status van het spel
 
-    /*
-    deze variabelen zijn afhankelijk van width en height die pas waarde krijgen na getDimensionsCanvas
-    wanneer krijgen deze variabelen hun waarde? moet getest worden 
-    */
-    //deze variabelen tijdelijk een fixed waarde toegekend van canvas width - R
-    xMax = 440,
-    yMax = 440,
-    //xMax = width - R,         // maximale waarde van x = width - R
-    //ymax = height - R,        // maximale waarde van y = height - R
+    xMax,                     // maximale waarde van x
+    yMax                      // maximale waarde van y
 
-    direction = UP;
-
-
-$(document).ready(function () {
-    $("#startSnake").click(init);
-    $("#stopSnake").click(stop);
-});
+    lastPressedArrowKey = UP; // string van de laatst gedrukte arrow key
 
 $(document).keydown(function (e) {
-	switch (e.which) {
-	case 37: // left
-	switchDirection = LEFT;
-	break;
-	case 38: // up
-	switchDirection = UP;
-	break;
-	case 39: // right
-	switchDirection = RIGHT;
-	break;
-	case 40: // down
-	switchDirection = DOWN;
-	break;
-}
+    switch (e.code) {
+    case "ArrowLeft":
+       lastPressedArrowKey = LEFT;
+       break;
+    case "ArrowUp":
+       lastPressedArrowKey = UP;
+       break;
+    case "ArrowRight":
+       lastPressedArrowKey = RIGHT;
+       break;
+    case "ArrowDown":
+       lastPressedArrowKey = DOWN;
+       break;
+    }
+});
+
+$(document).ready(function () {
+    prepareCanvas();
+    $("#stopSnake").click(stopGame);
+    $("#startSnake").click(init);
 });
 
 /**
-$(document).keydown(function(event){
-         current
-		 if (event.keyCode == 38) { 
-             stop(); 
-            }
-		});
+  @function prepareCanvas() -> void
+  @desc Haal de afmetingen van het canvas op en indien nodig pas deze aan
+        om de elementen mooi af te beelden, sla het max en min van de coordinaten op
 */
+function prepareCanvas() {
+    getDimensionsCanvas();
 
-/**
-  @function init() -> void
-  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, cre\"eer een slang, genereer voedsel, en teken alles
-*/
-function init() {
-    if(spelGestart == false) { 
-	setSpelGestart(true);
-	getDimensionsCanvas();
-    createStartSnake();
-    createFoods();
-    draw();
-    snaketimer = setInterval(function() {
-    move();}, SLEEPTIME);
-	} 
+    //DEZE FUNCTIE WERKT NOG NIET, HET CANVAS WORDT AANGEPAST NAAR PX AFMETINGEN WAT NIET MAG
+    //indien hoogte of breedte niet deelbaar is door 2 R dient het canvas
+    //nieuwe afmetingen te krijgen om de elementen mooi af te kunnen beelden
+    if (width % (2 * R) != 0 ||
+        height % (2 * R) != 0) {
+
+        var newSize = Math.floor(width / (2 * R)) * 2 * R;
+
+        //pas nieuwe afmetingen toe op canvas en sla deze afmetingen op in variabelen
+        $("#mySnakeCanvas").innerWidth(newSize);
+        $("#mySnakeCanvas").innerHeight(newSize);
+        getDimensionsCanvas();
+    }
+    //toekennen van max waarde die x of y kan hebben
+    xMax = width - R;     
+    yMax = height - R;    
 }
 
-//(Laurens) stopfunctie
- function stop() { 
-  resetCanvas();
-} 
- //(Laurens) resetfunctie
-function resetCanvas() { 
+/**
+  @function getDimensionsCanvas() -> void
+  @desc Haal de hoogte en wijdte van het canvas op via het DOM-object
+        en sla deze op in variabelen
+*/
+function getDimensionsCanvas() {
+    width = $("#mySnakeCanvas").innerWidth();
+    height = $("#mySnakeCanvas").innerHeight();
+}
+
+/**
+  @function stopGame() -> void
+  @desc Maak het canvas leeg, stop de timer, maak de array met voedsel leeg,
+        maak status gameGestart false en maak lastPressedKey terug naar boven
+*/
+function stopGame() { 
   $("#mySnakeCanvas").clearCanvas(); 
   clearInterval(snaketimer);
   foods = [];
-  setSpelGestart(false);
-  direction = UP;	
-  switchDirection = UP;
+  spelGestart = false 
+  lastPressedArrowKey = UP;
 } 
-
-function setSpelGestart(gestart) {
-	spelGestart = gestart;
-} 
-
-/*
-//deze code komt vanuit opdracht 2
-snakeTimer = setInterval(function() {
-move();}, SLEEPTIME);
-**/
-
-
-function getDimensionsCanvas() {
-    width = $("#mySnakeCanvas").width();
-    height = $("#mySnakeCanvas").height();
-    console.log("snakeCanvaswidth: " + width + " and snakeCanvasheight: " + height);
-}
 
 /**
-  @function move(direction) -> void
-  @desc Beweeg slang in aangegeven richting
-        tenzij slang uit canvas zou verdwijnen 
-  @param   {string} direction de richting (een van de constanten UP, DOWN, LEFT of RIGHT)
+  @function init() -> void
+  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, 
+        cre\"eer een slang, genereer voedsel en teken deze elementen
+        en start de timer die de slang doet bewegen
 */
-function move() {
-	//canMove en doMove moeten worden geschreven als methode van de klasse snake
-    //if (snake.canMove(direction)) {
-        //snake.doMove(direction);
-       determineDirection();
-	   newHead = calculateHead();
-	   if(!newHead.collidesWithOneOf(snake.segments)) {
-	   foodCollision = newHead.collidesWithOneOf(foods);
-	   updateSnakeCoordinaten(newHead, foodCollision);
-       draw();
-	   } else {verloren();} //resetCanvas();
+function init() {
+    if(spelGestart == false) { 
+        spelGestart = true
+        createStartSnake();
+        createFoods();
+        draw();
+        snaketimer = setInterval(function() {
+            move(lastPressedArrowKey);}, SLEEPTIME);
+    } 
 }
-    /**
-      }
-    else {
-        console.log("snake cannot move " + direction);
-      }
-    */
 
 /**
   @function draw() -> void
-  @desc Teken de slang en het voedsel
+  @desc Teken de slang en het voedsel op het canvas
 */
 function draw() {
     var canvas = $("#mySnakeCanvas").clearCanvas();
     drawElements(snake.segments, canvas);
     drawElements(foods, canvas);
-
 }
 
+/**
+  @function move() -> void
+  @desc Beweeg slang in de richting die het laatst met de pijljes werd gedrukt, corrigeer
+        indien deze uit het canvas zou verdwijnen en verlies het spel indien slang botst
+        met zichzelf
+*/
+function move() {
+    //bepaal de richting van de volgende kop van de slang 
+    determineDirection();
+    newHead = createNewHead();
 
+    //behandel mogelijke collisions van slang en voedsel
+    if(!newHead.collidesWithOneOf(snake.segments)) {
+        foodCollision = newHead.collidesWithOneOf(foods);
+        updateSnakeCoordinaten(newHead, foodCollision);
+        draw();
+    } else {
+        console.log("verloren")
+        verloren();
+    }
+}
 
-/** function updateSnakeCoordinaten() {
-    snake.segments.forEach((segment) => {
-        //console.log("segment x: " + segment.x);
-        segment.x;
-    });
+/**
+  @function determineDirection() -> void
+  @desc Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
+        de laatste drukte arrow key
 */
 function determineDirection() {
-	if(direction == UP && switchDirection == DOWN)  { 
-		direction = UP;
-	}
-	else if(direction ==  RIGHT && switchDirection == LEFT)  { 
-		direction =  RIGHT;
-	}
-	else if(direction == LEFT && switchDirection ==  RIGHT)  { 
-		direction = LEFT;
-	}
-	else if(direction == DOWN && switchDirection == UP)  { 
-		direction = DOWN;
-	} else {direction = switchDirection}
+    if (!oppositeDirectionSnake()) { 
+        snake.setDirection(lastPressedArrowKey);
+    }
 } 
 
-function calculateHead() { 
-	let snakeHead = snake.segments[0];
-	let newHead;
-	if(direction == UP) {
-		let y = snake.segments[0].y - (2*R);
-		if(y < 10) {y = 450;}
-		newHead = createHead(snake.segments[0].x, y);
-	}
-	else if(direction == DOWN) {
-		newHead = createHead(snake.segments[0].x, (snake.segments[0].y + (2*R)) % 460);
-	}
-	else if(direction == LEFT) {
-		let x = snake.segments[0].x - (2*R);
-		if(x < 10) {x = 450;}
-		newHead = createHead(x, snake.segments[0].y);
-	}
-	else if(direction == RIGHT) {
-		newHead = createHead((snake.segments[0].x + (2*R)) % 460, snake.segments[0].y);
-	} else {newHead = snakeHead;}
-	return newHead;
-	
-} 
+/**
+  @function oppositeDirectionSnake() -> boolean
+  @desc Geef aan of de huidige richting van de slang tegenovergesteld is
+        aan de laatste ingedrukte arrow key
+  @return {boolean} false indien de huidige richting van slang en laatst gedrukte
+                          arrowkey tegenovergesteld zijn
+                    anders true
+*/
+function oppositeDirectionSnake() {
+    return (snake.getDirection() == UP && lastPressedArrowKey == DOWN) ||
+            (snake.getDirection() == DOWN && lastPressedArrowKey == UP) ||
+            (snake.getDirection() == LEFT && lastPressedArrowKey == RIGHT) ||
+            (snake.getDirection() == RIGHT && lastPressedArrowKey == LEFT);
+}
 
+/**
+  @function createNewHead() -> Element
+  @desc Bereken de positie van het nieuwe hoofd van de slang indien deze binnen
+        of buiten het canvas valt
+  @return {Element} met straal R en color HEAD
+*/
+function createNewHead() {
+    let currentHead = snake.segments.at(-1);
+    let newHead;
+
+    //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
+    switch (lastPressedArrowKey) {
+        case UP:
+            newHead = createHead(currentHead.x, currentHead.y - (2*R));
+            break;
+        case DOWN:
+            newHead = createHead(currentHead.x, currentHead.y + (2*R));
+            break;
+        case LEFT:
+            newHead = createHead(currentHead.x - (2*R), currentHead.y);
+            break;
+        case RIGHT:
+            newHead = createHead(currentHead.x + (2*R), currentHead.y);
+            break;
+    }
+
+    //herbereken positie nieuwe head indien deze buiten het canvas zou vallen
+    if (elementOutOfBounds(newHead)) {
+        refitNewHeadToCanvas(newHead);
+    }
+    return newHead;
+}
+
+/**
+  @function elementOutOfBounds(element) -> boolean
+  @desc Geef aan of het element buiten het canvas valt
+  @param {Element} element een Element object
+  @return {boolean} false bij:
+                       - element van buiten het canvas
+                    anders true
+*/
+function elementOutOfBounds(element) {
+    return element.x < XMIN || element.x > xMax ||
+            element.y < YMIN || element.y > yMax;
+}
+
+
+/**
+  @function refitNewHeadToCanvas(element) -> void
+  @desc Pas de x of y coordinaat van het nieuwe hoofd aan
+        zodat deze weer binnen het canvas valt
+  @param {Element} element een Element object
+*/
+function refitNewHeadToCanvas(element) {
+    switch (lastPressedArrowKey) {
+        case UP:
+            element.y = yMax;
+            break;
+        case DOWN:
+            element.y = YMIN;
+            break;
+        case LEFT:
+            element.x = xMax;
+            break;
+        case RIGHT:
+            element.x = XMIN;
+            break;
+    }
+}
+/**
+  @function updateSnakeCoordinaten(newHead, foodCollision) -> void
+  @desc Past coordinaten van de slang en reageer indien deze
+        met voedsel botst
+  @param {Element} newHead de nieuwe head van de slang
+  @param {boolean} foodCollision false bij botsing nieuwe head met voedsel
+                                 anders true
+*/
 function updateSnakeCoordinaten(newHead, foodCollision) {
-	snake.segments[0].color = SNAKE;
-	snake.segments.unshift(newHead);
-	if(!foodCollision) {
-		snake.segments.pop();
-		} else {removeFood(newHead.x, newHead.y);}
+    snake.segments.at(-1).color = SNAKE;
+    snake.segments.push(newHead);
+    if(!foodCollision) {
+        snake.segments.shift();
+    } else {
+        removeFood(newHead.x, newHead.y);
+    }
 }
 
+/**
+  @function removeFood(x, y) -> void
+  @desc Verwijder voedsel indien deze op een gegeven x en y coordinaat ligt
+  @param {number} x x-coordinaat
+  @param {number} y y-coordinaat
+*/
+function removeFood(x, y) {
+    //ga alle elementen af in de array foods 
+    for(var i = 0; i < foods.length; i++){
+        //verwijder voedsel dat op de meegegeven coordinaten staat
+        if (foods[i].x == x && foods[i].y == y) { 
+            foods.splice(i, 1); 
+        } 
+    } 
+} 
+
+/**
+  @function verloren() -> void
+  @desc Stop het spel en geef aan de gebruiker aan dat deze verloren is
+*/
 function verloren() {
-	resetCanvas();
-	drawVerloren();
+    stopGame();
+    drawVerloren();
 }
 
+/**
+  @function drawVerloren -> void
+  @desc Teken een afbeelding op het canvas dat duidelijk aangeeft dat gebruiker is verloren
+*/
 function drawVerloren() {
-	$("#mySnakeCanvas").drawImage({
-	source: 'sad_snake.jpg',
-	x: 210, y: 240,
-	scale : 0.5
-	});
+    $("#mySnakeCanvas").drawImage({
+    source: 'sad_snake.jpg',
+    x: 210, y: 240,
+    scale : 0.5
+    });
 }
 
 
@@ -229,20 +306,41 @@ function drawVerloren() {
  **                 Constructors                                          **
  ***************************************************************************/
 /**
-   @constructor Snake
-   @param {[Element] segments een array met aaneengesloten slangsegmenten
+  @constructor Snake
+  @param {[Element] segments een array met aaneengesloten slangsegmenten
                    Het laatste element van segments wordt de kop van de slang 
 */ 
 function Snake(segments) {
     this.segments = segments;
+    this.direction = UP;
 }
 
 /**
-   @constructor Element
-   @param radius straal
-   @param {number} x x-coordinaat middelpunt
-   @param {number} y y-coordinaat middelpunt
-   @param {string} color kleur van het element
+
+/**
+  @function getDirection() -> string
+  @desc Get de huidige richting van de slang
+  @return {string} direction richting van de slang
+*/
+Snake.prototype.getDirection = function() {
+    return this.direction;
+}
+
+/**
+  @function setDirection(direction) -> void
+  @desc Set een nieuwe richting aan de slang
+  @param {string} direction nieuwe richten van de slang 
+*/
+Snake.prototype.setDirection = function(direction) {
+    this.direction = direction;
+}
+
+/**
+  @constructor Element
+  @param radius straal
+  @param {number} x x-coordinaat middelpunt
+  @param {number} y y-coordinaat middelpunt
+  @param {string} color kleur van het element
 */ 
 function Element(radius, x, y, color) {
     this.radius = radius;
@@ -251,8 +349,14 @@ function Element(radius, x, y, color) {
     this.color = color;
 }
 
-//volgens aanwijzing 7.6 is dit de beste manier om methode toe te voegen.
-//toevoegen documentatie nog nodig
+/**
+  @function collidesWithOneOf(elements) -> boolean
+  @desc Geef aan dit element bots met een andere array van elementen
+  @param [Element] elements een array van elementen
+  @return {boolean} false indien dit element niet botst met 1 van
+                    de andere elementen in de array
+                    true indien wel
+*/
 Element.prototype.collidesWithOneOf = function(elements) {
     var xcoordinaat = this.x;
     var ycoordinaat = this.y;
@@ -261,13 +365,6 @@ Element.prototype.collidesWithOneOf = function(elements) {
     });
 }
 
-function removeFood(x,y) { 
-    for(var i = 0; i < foods.length; i++){ 
-        if (foods[i].x == x && foods[i].y == y) { 
-            foods.splice(i, 1); 
-        } 
-	} 
-} 
 
 /***************************************************************************
  **                 Hulpfuncties                                          **
@@ -279,14 +376,12 @@ function removeFood(x,y) {
         in het midden van het veld
   @return: slang volgens specificaties
 */
-
-
-
 function createStartSnake() {
-	var segments   = [createHead(10 - R + width/2, height/2 - R - 10),  createSegment(10 - R + width/2, R + height/2 - 10) ];
+    var segments   = [createSegment(width/2, height/2), 
+                      createHead(width/2, height/2 - 2 * R)];
     snake = new Snake(segments);
-	} 
-	
+    } 
+    
 /**
   @function createSegment(x,y) -> Element
   @desc Slangsegment creeren op een bepaalde plaats
@@ -349,6 +444,38 @@ function drawElements(elements, canvas) {
 }
 
 /**
+  @function createFoods() -> array met food
+  @desc [Element] array van random verdeelde voedselpartikelen
+  @return [Element] array met food
+*/
+function createFoods() {   
+   var  i = 0,    
+        food;
+   while (i < NUMFOODS ) {
+     food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), YMIN + getRandomMultipleOfRadius(0, yMax));
+     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
+       foods.push(food);
+       i++
+     }
+   }  
+}
+
+/**
+  @function getRandomMultipeOfRadius(min: number, max: number) -> number
+  @desc Creeren van random veelvoud van het dubbele van de radius in het interval [min, max]
+  @param {number} min een geheel getal als onderste grenswaarde
+  @param {number} max een geheel getal als bovenste grenswaarde (max > min)
+  @return {number} een random geheel getal x waarvoor geldt: min <= x <= max && (x % (2*R)) = 0
+*/
+function getRandomMultipleOfRadius(min, max) {
+    var res;
+    //genereer willekeurig getal dat deelbaar is door 2*R
+    //dit zorgt ervoor dat x en y zo gekozen worden dat ze mooi op canvas worden afgebeeld
+    res = getRandomInt(min, Math.floor(max / (2 * R))) * 2 * R;
+    return res;
+}
+
+/**
   @function getRandomInt(min: number, max: number) -> number
   @desc Creeren van random geheel getal in het interval [min, max] 
   @param {number} min een geheel getal als onderste grenswaarde
@@ -373,31 +500,11 @@ function getRandomInt(min, max) {
   @function isPosInteger(x: number) -> boolean
   @desc Bepalen of het gaat om een positief geheel getal
   @param {number} een getal
-  @return {boolean} true of false waarde
+  @return {boolean} false bij:
+                       - geen getal
+                       - kleiner dan 0;
+                    anders true
 */
 function isPosInteger(x) {
     return x >= 0 && Number.isInteger(x);
 }
-
-/**
-  @function createFoods() -> array met food
-  @desc [Element] array van random verdeelde voedselpartikelen
-  @return [Element] array met food
-*/
-function createFoods() {   
-   var  i = 0,    
-        food;
-   while (i < NUMFOODS ) {
-     food = createFood(coordinaten[getRandomInt(0, coordinaten.length - 1)], coordinaten[getRandomInt(0, coordinaten.length - 1)]);
-     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
-       console.log("food x: " + food.x + " and food y: " + food.y);
-       foods.push(food);
-       i++
-     }
-   }  
-   
-
-   
-   
-}
-
