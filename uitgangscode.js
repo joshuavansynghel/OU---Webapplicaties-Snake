@@ -30,6 +30,7 @@ var snake,
 
     lastPressedArrowKey = UP; // string van de laatst gedrukte arrow key
 
+
 $(document).keydown(function (e) {
     switch (e.code) {
     case "ArrowLeft":
@@ -52,6 +53,7 @@ $(document).ready(function () {
     $("#stopSnake").click(stopGame);
     $("#startSnake").click(init);
 });
+
 
 /**
   @function prepareCanvas() -> void
@@ -209,7 +211,7 @@ function createNewHead() {
     let newHead;
 
     //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
-    switch (lastPressedArrowKey) {
+    switch (snake.getDirection()) {
         case UP:
             newHead = createHead(currentHead.x, currentHead.y - (2*R));
             break;
@@ -252,7 +254,7 @@ function elementOutOfBounds(element) {
   @param {Element} element een Element object
 */
 function refitNewHeadToCanvas(element) {
-    switch (lastPressedArrowKey) {
+    switch (snake.getDirection()) {
         case UP:
             element.y = yMax;
             break;
@@ -454,17 +456,6 @@ function createHead(x, y) {
 }
 
 /**
-  @function createFood(x,y) -> Element
-  @desc Voedselelement creeren op een bepaalde plaats
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaart middelpunt
-  @return: {Element} met straal R en color FOOD
-*/
-function createFood(x, y) {
-    return new Element(R, x, y, FOOD);
-}
-
-/**
   @function drawElements(elements, canvas) -> void
   @desc Elementen tekenen
   @param [Element] array van elementen
@@ -510,6 +501,17 @@ function createFoods() {
 }
 
 /**
+  @function createFood(x,y) -> Element
+  @desc Voedselelement creeren op een bepaalde plaats
+  @param {number} x x-coordinaat middelpunt
+  @param {number} y y-coordinaart middelpunt
+  @return: {Element} met straal R en color FOOD
+*/
+function createFood(x, y) {
+    return new Element(R, x, y, FOOD);
+}
+
+/**
   @function getRandomMultipeOfRadius(min: number, max: number) -> number
   @desc Creeren van random veelvoud van het dubbele van de radius in het interval [min, max]
   @param {number} min een geheel getal als onderste grenswaarde
@@ -530,6 +532,8 @@ function getRandomMultipleOfRadius(min, max) {
   @param {number} min een geheel getal als onderste grenswaarde
   @param {number} max een geheel getal als bovenste grenswaarde (max > min)
   @return {number} een random geheel getal x waarvoor geldt: min <= x <= max
+  @throws {Error} Het moeten gehele getallen van 0 of groter zijn
+  @throws {Error} Het eerste argument moet kleiner of gelijk aan het tweede argument zijn
 */
 function getRandomInt(min, max) {
     var res;
