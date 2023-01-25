@@ -30,7 +30,7 @@ var snake,
 
     lastPressedArrowKey = UP; // string van de laatst gedrukte arrow key
 
-/**
+
 $(document).keydown(function (e) {
     switch (e.code) {
     case "ArrowLeft":
@@ -53,7 +53,6 @@ $(document).ready(function () {
     $("#stopSnake").click(stopGame);
     $("#startSnake").click(init);
 });
-*/
 
 
 /**
@@ -234,7 +233,7 @@ function elementOutOfBounds(element) {
   @param {Element} element een Element object
 */
 function refitNewHeadToCanvas(element) {
-    switch (lastPressedArrowKey) {
+    switch (snake.getDirection()) {
         case UP:
             element.y = yMax;
             break;
