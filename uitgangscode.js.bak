@@ -640,7 +640,7 @@ function adjustEntriesLocalStorage(place, newName) {
  **                 LocalStorage                                    **
  ***************************************************************************/
 
-//localStorage.clear();
+localStorage.clear();
 
 /**
 entry1 = JSON.stringify(new EntryScore("SnakeKiller030", 40, true));
