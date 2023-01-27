@@ -1,49 +1,33 @@
-const R        = 10,          // straal van een element
-      STEP     = 2*R,         // stapgrootte
-                              // er moet gelden: WIDTH = HEIGHT
-      LEFT     = "left",      // bewegingsrichtingen 
-      RIGHT    = "right",
-      UP       = "up",
-      DOWN     = "down",
-
-
-      NUMFOODS = 30,          // aantal voedselelementen 
-
-      XMIN     = R,           // minimale x waarde
-      YMIN     = R,           // minimale y waarde
-      
-      SLEEPTIME = 200,        // aantal milliseconde voor de timer
-
-      SNAKE   = "DarkRed",    // kleur van een slangsegment
-      FOOD    = "Olive",      // kleur van voedsel
-      HEAD    = "DarkOrange"; // kleur van de kop van de slang
+import * as settings from "./settings.js";
+import {Element} from "./element.js";
+import {Snake} from "./snake.js";
     
 var snake,
-    foods = [],               // voedsel voor de slang
-    width,                    // breedte van het tekenveld
-    height,                   // hoogte van het tekenveld
-    snaketimer,               // timer van de snake
-    spelGestart = false,      // status van het spel
+    foods = [],                        // voedsel voor de slang
+    width,                             // breedte van het tekenveld
+    height,                            // hoogte van het tekenveld
+    snaketimer,                        // timer van de snake
+    spelGestart = false,               // status van het spel
 
-    xMax,                     // maximale waarde van x
-    yMax                      // maximale waarde van y
+    xMax,                              // maximale waarde van x
+    yMax,                              // maximale waarde van y
 
-    lastPressedArrowKey = UP; // string van de laatst gedrukte arrow key
+    lastPressedArrowKey = settings.UP; // string van de laatst gedrukte arrow key
 
 
 $(document).keydown(function (e) {
     switch (e.code) {
     case "ArrowLeft":
-       lastPressedArrowKey = LEFT;
+       lastPressedArrowKey = settings.LEFT;
        break;
     case "ArrowUp":
-       lastPressedArrowKey = UP;
+       lastPressedArrowKey = settings.UP;
        break;
     case "ArrowRight":
-       lastPressedArrowKey = RIGHT;
+       lastPressedArrowKey = settings.RIGHT;
        break;
     case "ArrowDown":
-       lastPressedArrowKey = DOWN;
+       lastPressedArrowKey = settings.DOWN;
        break;
     }
 });
@@ -66,10 +50,10 @@ function prepareCanvas() {
     //DEZE FUNCTIE WERKT NOG NIET, HET CANVAS WORDT AANGEPAST NAAR PX AFMETINGEN WAT NIET MAG
     //indien hoogte of breedte niet deelbaar is door 2 R dient het canvas
     //nieuwe afmetingen te krijgen om de elementen mooi af te kunnen beelden
-    if (width % (2 * R) != 0 ||
-        height % (2 * R) != 0) {
+    if (width % (2 * settings.R) != 0 ||
+        height % (2 * settings.R) != 0) {
 
-        var newSize = Math.floor(width / (2 * R)) * 2 * R;
+        let newSize = Math.floor(width / (2 * settings.R)) * 2 * settings.R;
 
         //pas nieuwe afmetingen toe op canvas en sla deze afmetingen op in variabelen
         $("#mySnakeCanvas").innerWidth(newSize);
@@ -77,8 +61,8 @@ function prepareCanvas() {
         getDimensionsCanvas();
     }
     //toekennen van max waarde die x of y kan hebben
-    xMax = width - R;     
-    yMax = height - R;    
+    xMax = width - settings.R;     
+    yMax = height - settings.R;    
 }
 
 /**
@@ -108,7 +92,7 @@ function stopGame() {
   
   foods = [];
   spelGestart = false 
-  lastPressedArrowKey = UP;
+  lastPressedArrowKey = settings.UP;
 } 
 
 /**
@@ -133,7 +117,7 @@ function init() {
         createFoods();
         draw();
         snaketimer = setInterval(function() {
-            move(lastPressedArrowKey);}, SLEEPTIME);
+            move(lastPressedArrowKey);}, settings.SLEEPTIME);
     } 
 }
 
@@ -156,7 +140,7 @@ function draw() {
 function move() {
     //bepaal de richting van de volgende kop van de slang 
     determineDirection();
-    newHead = createNewHead();
+    let newHead = createNewHead();
 	
 	//aanvulling Laurens 
 	let foodCollision = false; 
@@ -165,12 +149,12 @@ function move() {
 	
     //behandel mogelijke collisions van slang en voedsel
 	if (!newHead.collidesWithOneOf(snake.segments)) {
-	foodCollision = newHead.collidesWithOneOf(foods);
-	updateSnakeCoordinaten(newHead, foodCollision);
-	draw();
+    	foodCollision = newHead.collidesWithOneOf(foods);
+    	updateSnakeCoordinaten(newHead, foodCollision);
+    	draw();
 	} else {determineResultGame();}
 	if (foodCollision && noFoodsLeft) { 
-	  determineResultGame(); 
+	    determineResultGame(); 
 	}  
 }
 
@@ -194,10 +178,10 @@ function determineDirection() {
                     anders true
 */
 function oppositeDirectionSnake() {
-    return (snake.getDirection() == UP && lastPressedArrowKey == DOWN) ||
-            (snake.getDirection() == DOWN && lastPressedArrowKey == UP) ||
-            (snake.getDirection() == LEFT && lastPressedArrowKey == RIGHT) ||
-            (snake.getDirection() == RIGHT && lastPressedArrowKey == LEFT);
+    return (snake.getDirection() == settings.UP && lastPressedArrowKey == settings.DOWN) ||
+            (snake.getDirection() == settings.DOWN && lastPressedArrowKey == settings.UP) ||
+            (snake.getDirection() == settings.LEFT && lastPressedArrowKey == settings.RIGHT) ||
+            (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
 }
 
 /**
@@ -212,17 +196,17 @@ function createNewHead() {
 
     //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
     switch (snake.getDirection()) {
-        case UP:
-            newHead = createHead(currentHead.x, currentHead.y - (2*R));
+        case settings.UP:
+            newHead = createHead(currentHead.x, currentHead.y - (2 * settings.R));
             break;
-        case DOWN:
-            newHead = createHead(currentHead.x, currentHead.y + (2*R));
+        case settings.DOWN:
+            newHead = createHead(currentHead.x, currentHead.y + (2 * settings.R));
             break;
-        case LEFT:
-            newHead = createHead(currentHead.x - (2*R), currentHead.y);
+        case settings.LEFT:
+            newHead = createHead(currentHead.x - (2 * settings.R), currentHead.y);
             break;
-        case RIGHT:
-            newHead = createHead(currentHead.x + (2*R), currentHead.y);
+        case settings.RIGHT:
+            newHead = createHead(currentHead.x + (2 * settings.R), currentHead.y);
             break;
     }
 
@@ -242,8 +226,8 @@ function createNewHead() {
                     anders true
 */
 function elementOutOfBounds(element) {
-    return element.x < XMIN || element.x > xMax ||
-            element.y < YMIN || element.y > yMax;
+    return element.x < settings.XMIN || element.x > xMax ||
+            element.y < settings.YMIN || element.y > yMax;
 }
 
 
@@ -255,17 +239,17 @@ function elementOutOfBounds(element) {
 */
 function refitNewHeadToCanvas(element) {
     switch (snake.getDirection()) {
-        case UP:
+        case settings.UP:
             element.y = yMax;
             break;
-        case DOWN:
-            element.y = YMIN;
+        case settings.DOWN:
+            element.y = settings.YMIN;
             break;
-        case LEFT:
+        case settings.LEFT:
             element.x = xMax;
             break;
-        case RIGHT:
-            element.x = XMIN;
+        case settings.RIGHT:
+            element.x = settings.XMIN;
             break;
     }
 }
@@ -278,7 +262,7 @@ function refitNewHeadToCanvas(element) {
                                  anders true
 */
 function updateSnakeCoordinaten(newHead, foodCollision) {
-    snake.segments.at(-1).color = SNAKE;
+    snake.segments.at(-1).color = settings.SNAKE;
     snake.segments.push(newHead);
     if(!foodCollision) {
         snake.segments.shift();
@@ -339,7 +323,7 @@ function gewonnen(place) {
 	enterNameFields();
 	
 	enterWinnerNameTimer = setInterval(function() {
-    checkIfNameWinnerIsPresent();}, WAITFORNAMEWINNER);
+    checkIfNameWinnerIsPresent();}, settings.WAITFORNAMEWINNER);
 }
 
 function drawGewonnen() {
@@ -356,65 +340,7 @@ function drawGewonnen() {
 /***************************************************************************
  **                 Constructors                                          **
  ***************************************************************************/
-/**
-  @constructor Snake
-  @param {[Element] segments een array met aaneengesloten slangsegmenten
-                   Het laatste element van segments wordt de kop van de slang 
-*/ 
-function Snake(segments) {
-    this.segments = segments;
-    this.direction = UP;
-}
 
-/**
-
-/**
-  @function getDirection() -> string
-  @desc Get de huidige richting van de slang
-  @return {string} direction richting van de slang
-*/
-Snake.prototype.getDirection = function() {
-    return this.direction;
-}
-
-/**
-  @function setDirection(direction) -> void
-  @desc Set een nieuwe richting aan de slang
-  @param {string} direction nieuwe richten van de slang 
-*/
-Snake.prototype.setDirection = function(direction) {
-    this.direction = direction;
-}
-
-/**
-  @constructor Element
-  @param radius straal
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaat middelpunt
-  @param {string} color kleur van het element
-*/ 
-function Element(radius, x, y, color) {
-    this.radius = radius;
-    this.x = x;
-    this.y = y;
-    this.color = color;
-}
-
-/**
-  @function collidesWithOneOf(elements) -> boolean
-  @desc Geef aan dit element bots met een andere array van elementen
-  @param [Element] elements een array van elementen
-  @return {boolean} false indien dit element niet botst met 1 van
-                    de andere elementen in de array
-                    true indien wel
-*/
-Element.prototype.collidesWithOneOf = function(elements) {
-    var xcoordinaat = this.x;
-    var ycoordinaat = this.y;
-    return elements.some(function(el) {
-        return xcoordinaat == el.x && ycoordinaat == el.y;
-    });
-}
 
 
 /***************************************************************************
@@ -429,7 +355,7 @@ Element.prototype.collidesWithOneOf = function(elements) {
 */
 function createStartSnake() {
     var segments   = [createSegment(width/2, height/2), 
-                      createHead(width/2, height/2 - 2 * R)];
+                      createHead(width/2, height/2 - 2 * settings.R)];
     snake = new Snake(segments);
     } 
     
@@ -441,7 +367,7 @@ function createStartSnake() {
   @return: {Element} met straal R en color SNAKE
 */
 function createSegment(x, y) {
-    return new Element(R, x, y, SNAKE);
+    return new Element(settings.R, x, y, settings.SNAKE);
 }
 
 /**
@@ -452,7 +378,7 @@ function createSegment(x, y) {
   @return: {Element} met straal R en color HEAD
 */
 function createHead(x, y) {
-    return new Element(R, x, y, HEAD);
+    return new Element(settings.R, x, y, settings.HEAD);
 }
 
 /**
@@ -491,8 +417,9 @@ function drawElements(elements, canvas) {
 function createFoods() {   
    var  i = 0,    
         food;
-   while (i < NUMFOODS ) {
-     food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), YMIN + getRandomMultipleOfRadius(0, yMax));
+   while (i < settings.NUMFOODS ) {
+     food = createFood(settings.XMIN + getRandomMultipleOfRadius(0, xMax), 
+                        settings.YMIN + getRandomMultipleOfRadius(0, yMax));
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
        foods.push(food);
        i++
@@ -508,7 +435,7 @@ function createFoods() {
   @return: {Element} met straal R en color FOOD
 */
 function createFood(x, y) {
-    return new Element(R, x, y, FOOD);
+    return new Element(settings.R, x, y, settings.FOOD);
 }
 
 /**
@@ -522,7 +449,7 @@ function getRandomMultipleOfRadius(min, max) {
     var res;
     //genereer willekeurig getal dat deelbaar is door 2*R
     //dit zorgt ervoor dat x en y zo gekozen worden dat ze mooi op canvas worden afgebeeld
-    res = getRandomInt(min, Math.floor(max / (2 * R))) * 2 * R;
+    res = getRandomInt(min, Math.floor(max / (2 * settings.R))) * 2 * settings.R;
     return res;
 }
 
@@ -569,6 +496,8 @@ function isPosInteger(x) {
 var score = 0; 
 var nameWinner;
 
+var entriesLocalStorage;
+
  
 
 function getNameWinner() { 
@@ -614,25 +543,25 @@ function scoreIsNewHigh(score) {
 } 
 
 function adjustEntriesLocalStorage(place, newName) { 
-		newScore = getScoreField();
-		newEntry = new EntryScore(newName, newScore); 
+		let newScore = getScoreField();
+		let newEntry = new EntryScore(newName, newScore); 
 		//console.log(place);
 		switch (place) {
-		case "placeOne": 
-		entryPlaceOne = entriesLocalStorage.get("placeOne");
-		entryPlaceTwo = entriesLocalStorage.get("placeTwo");
-		entriesLocalStorage.set("placeOne", newEntry);
-		entriesLocalStorage.set("placeTwo",entryPlaceOne);
-		entriesLocalStorage.set("placeThree",entryPlaceTwo);
-		break;
+    		case "placeOne": 
+    		entryPlaceOne = entriesLocalStorage.get("placeOne");
+    		entryPlaceTwo = entriesLocalStorage.get("placeTwo");
+    		entriesLocalStorage.set("placeOne", newEntry);
+    		entriesLocalStorage.set("placeTwo",entryPlaceOne);
+    		entriesLocalStorage.set("placeThree",entryPlaceTwo);
+		  break;
 		case "placeTwo": 
-		entryPlaceTwo = entriesLocalStorage.get("placeTwo");
-		entriesLocalStorage.set("placeTwo",newEntry);
-		entriesLocalStorage.set("placeThree",entryPlaceTwo);
-		break;
+    		entryPlaceTwo = entriesLocalStorage.get("placeTwo");
+    		entriesLocalStorage.set("placeTwo",newEntry);
+    		entriesLocalStorage.set("placeThree",entryPlaceTwo);
+    		break;
 		case "placeThree": 
-		entriesLocalStorage.set("placeThree",newEntry);
-		break;
+		    entriesLocalStorage.set("placeThree",newEntry);
+		    break;
 		} 
 } 
 
@@ -671,7 +600,7 @@ function getContentLocalStorage(){
 	initEntriesLocalStorage();
 	let keysLocalStorage = getKeysLocalStorage();
 	let filteredKeysLocalStorage = filterKeysLocalStorage(keysLocalStorage);
-	entriesLocalStorage = getEntriesLocalStorage(filteredKeysLocalStorage);
+	let entriesLocalStorage = getEntriesLocalStorage(filteredKeysLocalStorage);
 	completeEntriesLocalStorage();
 	assignStorageToScorefields(entriesLocalStorage);
 	addEntriesToLocalStorage();
@@ -745,7 +674,7 @@ function addEntriesToLocalStorage() {
  ***************************************************************************/
 
 var enterWinnerNameTimer;
-WAITFORNAMEWINNER = 1000
+
 
 
 function fillScoreField() {
@@ -775,24 +704,24 @@ function assignStorageToScorefields(sortedEntries) {
 	entriesLocalStorage.forEach((entryScore, key) => { ; 
 		switch (key) {
 		case "placeOne": 
-		$(".namefield1").text(entryScore.name);
-		$(".scorefield1").text(entryScore.score);
-		break;
+    		$(".namefield1").text(entryScore.name);
+    		$(".scorefield1").text(entryScore.score);
+		    break;
 		case "placeTwo": 
-		$(".namefield2").text(entryScore.name);
-		$(".scorefield2").text(entryScore.score);
-		break;
+    		$(".namefield2").text(entryScore.name);
+    		$(".scorefield2").text(entryScore.score);
+		    break;
 		case "placeThree": 
-		$(".namefield3").text(entryScore.name);
-		$(".scorefield3").text(entryScore.score);
-		break;
+    		$(".namefield3").text(entryScore.name);
+    		$(".scorefield3").text(entryScore.score);
+		    break;
 		} 
 	}); 
 } 
 
 function determineResultGame() { 
 	let result = getScoreField();
-	place = scoreIsNewHigh(result);
+	let place = scoreIsNewHigh(result);
 	if(!place.includes("noHighscore")) { 
 		gewonnen(place); 
 	} else {verloren();}
@@ -808,8 +737,8 @@ function enterNameFields() {
 
 
 function createEnterNameButton() { 
-	labe1One = document.createElement("label");
-	labe1Two = document.createElement("label");
+	let labe1One = document.createElement("label");
+	let labe1Two = document.createElement("label");
 	$(".scoreboard").append(labe1One);
 	$(".scoreboard").append(labe1Two);
 	var button = document.createElement("button");
@@ -825,12 +754,12 @@ function createEnterNameField() {
 } 
 
 function createEventlisterer() { 
-	buttonCollection = document.getElementsByTagName("button");
-	nameFieldCollection = document.getElementsByTagName("INPUT");
-	button = buttonCollection[0];
-	nameField = nameFieldCollection[2]
+	let buttonCollection = document.getElementsByTagName("button");
+	let nameFieldCollection = document.getElementsByTagName("INPUT");
+	let button = buttonCollection[0];
+	let nameField = nameFieldCollection[2]
 	buttonCollection[0].addEventListener("click", function() {
-	nameWinner = nameFieldCollection[2].value.substring(0, 13);
+	let nameWinner = nameFieldCollection[2].value.substring(0, 13);
 	});
 	return nameWinner;
 } 
@@ -839,7 +768,7 @@ function createEventlisterer() {
 
 function checkIfNameWinnerIsPresent() { 
 	console.log(score);
-	nameWinner = getNameWinner();
+	var nameWinner = getNameWinner();
 	if (nameWinner !== undefined) { 
 
 		changeScoreWithinGame(place, nameWinner);
@@ -850,23 +779,23 @@ function checkIfNameWinnerIsPresent() {
 
 
 function removeEnterNameFields() { 
-	labelCollection = document.getElementsByTagName("label");
-	labe1One = labelCollection[10];
-	labe1Two = labelCollection[11];
+	let labelCollection = document.getElementsByTagName("label");
+	let labe1One = labelCollection[10];
+	let labe1Two = labelCollection[11];
 	
 	if(labe1One !== undefined && labe1Two !== undefined ) { 
 		labe1One.remove();
 		labe1Two.remove();
 	} 
 	
-	buttonCollection = document.getElementsByTagName("button");
-	button = buttonCollection[0];
+	let buttonCollection = document.getElementsByTagName("button");
+	let button = buttonCollection[0];
 	if(button !== undefined) { 
 		button.remove();
 	} 
 	
-	nameFieldCollection = document.getElementsByTagName("INPUT");
-	nameField = nameFieldCollection[2];
+	let nameFieldCollection = document.getElementsByTagName("INPUT");
+	let nameField = nameFieldCollection[2];
 	if(nameField !== undefined) { 
 		nameField.remove();
 	} 
