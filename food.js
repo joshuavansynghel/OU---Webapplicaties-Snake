@@ -2,6 +2,26 @@ import * as settings from "./settings.js";
 import {Element} from "./element.js";
 
 /**
+  @function createFoods() -> array met food
+  @desc [Element] array van random verdeelde voedselpartikelen
+  @return [Element] array met food
+*/
+function createFoods(snake) {   
+   var  i = 0,    
+        food,
+        foods;
+   while (i < settings.NUMFOODS ) {
+     food = createFood(settings.XMIN + getRandomMultipleOfRadius(0, xMax), 
+                        settings.YMIN + getRandomMultipleOfRadius(0, yMax));
+     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
+       foods.push(food);
+       i++
+     }
+   }
+   return foods;  
+}
+
+/**
   @function createFood(x,y) -> Element
   @desc Voedselelement creeren op een bepaalde plaats
   @param {number} x x-coordinaat middelpunt

@@ -5,7 +5,7 @@ import * as settings from "./settings.js";
   @param {[Element] segments een array met aaneengesloten slangsegmenten
                    Het laatste element van segments wordt de kop van de slang 
 */ 
-export function Snake(segments) {
+function Snake(segments) {
     this.segments = segments;
     this.direction = settings.UP;
 }
@@ -30,3 +30,36 @@ Snake.prototype.setDirection = function(direction) {
     this.direction = direction;
 }
 
+/**
+  @function createStartSnake() -> Snake
+  @desc Slang creëren, bestaande uit  twee segmenten, 
+        in het midden van het veld
+  @return: slang volgens specificaties
+*/
+export function createStartSnake() {
+    var segments   = [createSegment(width/2, height/2), 
+                      createHead(width/2, height/2 - 2 * settings.R)];
+    snake = new Snake(segments);
+    } 
+    
+/**
+  @function createSegment(x,y) -> Element
+  @desc Slangsegment creeren op een bepaalde plaats
+  @param {number} x x-coordinaat middelpunt
+  @param {number} y y-coordinaart middelpunt
+  @return: {Element} met straal R en color SNAKE
+*/
+function createSegment(x, y) {
+    return new Element(settings.R, x, y, settings.SNAKE);
+}
+
+/**
+  @function createHead(x,y) -> Element
+  @desc Head slang creeren op een bepaalde plaats
+  @param {number} x x-coordinaat middelpunt
+  @param {number} y y-coordinaart middelpunt
+  @return: {Element} met straal R en color HEAD
+*/
+function createHead(x, y) {
+    return new Element(settings.R, x, y, settings.HEAD);
+}
