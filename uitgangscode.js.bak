@@ -671,10 +671,8 @@ function EntryScore(name, scored) {
 
 
 /**
-  @function addScoreBoardEntries(entriesLocalStorage) -> void
-  @desc geeft de variabele entriesScoreboard een lege map, kent aan deze map standaard keys toe, vult de map met de entries uit de local storage en 
-  vult de lege keys aan met entryScore objecten
-  @param {map(String, EntryScore)} entriesLocalStorage scoreboard entries uit de local storage van de webbrowser
+  @function initScoreBoardEntries(entriesLocalStorage) -> void
+  @desc vul de map met de entries van het scorebord met de aanwezig entries uit de local storage van de browser
  */
 function addScoreBoardEntries(entriesLocalStorage){ 
 	setKeysScoreboard();

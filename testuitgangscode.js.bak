@@ -655,4 +655,4 @@ QUnit.test( "test isPosInteger met ongeldige waarden",
 
 //////////////////////aanvullinge Laurens 
 
-	///Qunit.test(   "     "  )   
+	Qunit.test(   "     "  )   
