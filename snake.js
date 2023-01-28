@@ -29,3 +29,4 @@ Snake.prototype.getDirection = function() {
 Snake.prototype.setDirection = function(direction) {
     this.direction = direction;
 }
+
