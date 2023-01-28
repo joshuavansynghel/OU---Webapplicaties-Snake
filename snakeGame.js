@@ -1,21 +1,23 @@
 import {Element} from "./element.js";
-import {Snake} from "./snake.js";
-import {createFood} from "./food.js";
+import {createStartSnake, createHead} from "./snake.js";
+import {createFoods} from "./food.js";
+import * as settings from "./settings.js";
 
 var snake,
     foods = [],                        // voedsel voor de slang
     snaketimer,                        // timer van de snake
-    spelGestart = false,               // status van het spel
+    gameStatus = settings.INACTIVE;     // status van het spel
 
-    xMax,
-    yMax;
-
- function getSnakeSegments() {
+ export function getSnakeSegments() {
  	return snake.segments;
  }
 
- function getFoods() {
+ export function getFoods() {
  	return foods;
+ }
+
+ export function getGameStatus() {
+    return gameStatus;
  } 
 
 /**
@@ -23,17 +25,19 @@ var snake,
   @desc Maak het canvas leeg, stop de timer, maak de array met voedsel leeg,
         maak status gameGestart false en maak lastPressedKey terug naar boven
 */
-function stopSnakeGame() { 
+export function stopSnakeGame() { 
   
+  /**
   //Aanvulling Laurens 
    clearInterval(enterWinnerNameTimer);
    resetScore();
    removeEnterNameFields();
    //Aanvulling Laurens
+   **/
   
   foods = [];
-  spelGestart = false 
-  lastPressedArrowKey = settings.UP;
+  gameStatus = settings.INACTIVE
+  //lastPressedArrowKey = settings.UP;
 }
 
 /**
@@ -43,9 +47,10 @@ function stopSnakeGame() {
         en start de timer die de slang doet bewegen
 */
 export function initSnakeGame() {
-    if(spelGestart == false) { 
-        spelGestart = true
+    if(gameStatus = settings.INACTIVE) { 
+        gameStatus = settings.ACTIVE;
         
+        /**
 		//Aanvulling Laurens
 		fillScoreField();
 		removeEnterNameFields();
@@ -53,9 +58,12 @@ export function initSnakeGame() {
 		resetNameWinner();
 		getContentLocalStorage();
 		//Aanvulling Laurens
+        */
 		
 		snake = createStartSnake();
+        console.log("snake Init: " + snake);
         foods = createFoods(snake);
+    }
 }
 
 /**
@@ -64,10 +72,15 @@ export function initSnakeGame() {
         indien deze uit het canvas zou verdwijnen en verlies het spel indien slang botst
         met zichzelf
 */
-function move() {
+export function move(lastPressedArrowKey) {
     //bepaal de richting van de volgende kop van de slang 
-    determineDirection();
+    determineDirection(lastPressedArrowKey);
     let newHead = createNewHead();
+
+    //herbereken positie nieuwe head indien deze buiten het tekenveld zou vallen
+    if (elementOutOfBounds(newHead)) {
+        refitNewHeadToCanvas(newHead);
+    }
 	
 	//aanvulling Laurens 
 	let foodCollision = false; 
@@ -78,38 +91,28 @@ function move() {
 	if (!newHead.collidesWithOneOf(snake.segments)) {
     	foodCollision = newHead.collidesWithOneOf(foods);
     	updateSnakeCoordinaten(newHead, foodCollision);
-    	draw();
-	} else {determineResultGame();}
+	} else {
+        gameStatus = settings.LOST;
+        determineResultGame();
+    }
 	if (foodCollision && noFoodsLeft) { 
+        gameStatus = settings.WON;
 	    determineResultGame(); 
 	}  
 }
+
+
 
 /**
   @function determineDirection() -> void
   @desc Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
         de laatste drukte arrow key
 */
-function determineDirection() {
-    if (!oppositeDirectionSnake()) { 
+function determineDirection(lastPressedArrowKey) {
+    if (!oppositeDirectionSnake(lastPressedArrowKey)) { 
         snake.setDirection(lastPressedArrowKey);
     }
 } 
-
-/**
-  @function oppositeDirectionSnake() -> boolean
-  @desc Geef aan of de huidige richting van de slang tegenovergesteld is
-        aan de laatste ingedrukte arrow key
-  @return {boolean} false indien de huidige richting van slang en laatst gedrukte
-                          arrowkey tegenovergesteld zijn
-                    anders true
-*/
-function oppositeDirectionSnake() {
-    return (snake.getDirection() == settings.UP && lastPressedArrowKey == settings.DOWN) ||
-            (snake.getDirection() == settings.DOWN && lastPressedArrowKey == settings.UP) ||
-            (snake.getDirection() == settings.LEFT && lastPressedArrowKey == settings.RIGHT) ||
-            (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
-}
 
 /**
   @function createNewHead() -> Element
@@ -117,7 +120,7 @@ function oppositeDirectionSnake() {
         of buiten het canvas valt
   @return {Element} met straal R en color HEAD
 */
-function createNewHead() {
+export function createNewHead() {
     let currentHead = snake.segments.at(-1);
     let newHead;
 
@@ -136,12 +139,22 @@ function createNewHead() {
             newHead = createHead(currentHead.x + (2 * settings.R), currentHead.y);
             break;
     }
-
-    //herbereken positie nieuwe head indien deze buiten het tekenveld zou vallen
-    if (elementOutOfBounds(newHead)) {
-        refitNewHeadToCanvas(newHead);
-    }
     return newHead;
+}
+
+/**
+  @function oppositeDirectionSnake() -> boolean
+  @desc Geef aan of de huidige richting van de slang tegenovergesteld is
+        aan de laatste ingedrukte arrow key
+  @return {boolean} false indien de huidige richting van slang en laatst gedrukte
+                          arrowkey tegenovergesteld zijn
+                    anders true
+*/
+function oppositeDirectionSnake(lastPressedArrowKey) {
+    return (snake.getDirection() == settings.UP && lastPressedArrowKey == settings.DOWN) ||
+            (snake.getDirection() == settings.DOWN && lastPressedArrowKey == settings.UP) ||
+            (snake.getDirection() == settings.LEFT && lastPressedArrowKey == settings.RIGHT) ||
+            (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
 }
 
 /**
@@ -153,8 +166,8 @@ function createNewHead() {
                     anders true
 */
 function elementOutOfBounds(element) {
-    return element.x < settings.XMIN || element.x > xMax ||
-            element.y < settings.YMIN || element.y > yMax;
+    return element.x < settings.XMIN || element.x > settings.xMax ||
+            element.y < settings.YMIN || element.y > settings.yMax;
 }
 
 
@@ -167,13 +180,13 @@ function elementOutOfBounds(element) {
 function refitNewHeadToCanvas(element) {
     switch (snake.getDirection()) {
         case settings.UP:
-            element.y = yMax;
+            element.y = settings.yMax;
             break;
         case settings.DOWN:
             element.y = settings.YMIN;
             break;
         case settings.LEFT:
-            element.x = xMax;
+            element.x = settings.xMax;
             break;
         case settings.RIGHT:
             element.x = settings.XMIN;

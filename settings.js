@@ -6,6 +6,11 @@ export const R        = 10,          // straal van een element
              UP       = "up",
              DOWN     = "down",
 
+             ACTIVE   = "active",
+             INACTIVE = "inactive",
+             WON      = "won",
+             LOST     = "lost",
+
 
              NUMFOODS = 30,          // aantal voedselelementen 
 
@@ -19,3 +24,11 @@ export const R        = 10,          // straal van een element
              HEAD    = "DarkOrange", // kleur van de kop van de slang
 
              WAITFORNAMEWINNER = 1000;
+
+export var   xMax,
+             yMax;
+
+export function setMaxCoordinates(width, height) {
+    xMax = width - R;
+    yMax = height - R;
+}

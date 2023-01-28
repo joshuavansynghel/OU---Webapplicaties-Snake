@@ -1,4 +1,5 @@
 import * as settings from "./settings.js";
+import {Element} from "./element.js";
 
 /**
   @constructor Snake
@@ -9,8 +10,6 @@ function Snake(segments) {
     this.segments = segments;
     this.direction = settings.UP;
 }
-
-/**
 
 /**
   @function getDirection() -> string
@@ -37,9 +36,14 @@ Snake.prototype.setDirection = function(direction) {
   @return: slang volgens specificaties
 */
 export function createStartSnake() {
+    let width = settings.xMax + settings.R;
+    let height = settings.yMax + settings.R;
+
+    console.log("width:" + width + " and height: " + height);
+
     var segments   = [createSegment(width/2, height/2), 
                       createHead(width/2, height/2 - 2 * settings.R)];
-    snake = new Snake(segments);
+    return new Snake(segments);
     } 
     
 /**
@@ -60,6 +64,6 @@ function createSegment(x, y) {
   @param {number} y y-coordinaart middelpunt
   @return: {Element} met straal R en color HEAD
 */
-function createHead(x, y) {
+export function createHead(x, y) {
     return new Element(settings.R, x, y, settings.HEAD);
 }

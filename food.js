@@ -6,13 +6,15 @@ import {Element} from "./element.js";
   @desc [Element] array van random verdeelde voedselpartikelen
   @return [Element] array met food
 */
-function createFoods(snake) {   
+export function createFoods(snake) {   
    var  i = 0,    
         food,
-        foods;
+        foods = [];
+   console.log("snake:" + JSON.stringify(snake));
    while (i < settings.NUMFOODS ) {
-     food = createFood(settings.XMIN + getRandomMultipleOfRadius(0, xMax), 
-                        settings.YMIN + getRandomMultipleOfRadius(0, yMax));
+     food = createFood(settings.XMIN + getRandomMultipleOfRadius(0, settings.xMax), 
+                        settings.YMIN + getRandomMultipleOfRadius(0, settings.yMax));
+     console.log("food: " + food + " and snake: " + JSON.stringify(snake.segments));
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
        foods.push(food);
        i++
@@ -28,7 +30,7 @@ function createFoods(snake) {
   @param {number} y y-coordinaart middelpunt
   @return: {Element} met straal R en color FOOD
 */
-export function createFood(x, y) {
+function createFood(x, y) {
     return new Element(settings.R, x, y, settings.FOOD);
 }
 

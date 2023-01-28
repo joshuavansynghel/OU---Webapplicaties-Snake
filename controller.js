@@ -1,11 +1,9 @@
 import * as settings from "./settings.js";
-import {initSnakeGame,stopSnakeGame} from "./snakeGame.js";
+import {setMaxCoordinates} from "./settings.js";
+import {initSnakeGame,stopSnakeGame, move, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
     
 var width,                             // breedte van het tekenveld
     height,                            // hoogte van het tekenveld
-
-    xMax,                              // maximale waarde van x
-    yMax,                              // maximale waarde van y
 
     snaketimer,
 
@@ -31,35 +29,10 @@ $(document).keydown(function (e) {
 
 $(document).ready(function () {
     getDimensionsCanvas();
-    $("#stopSnake").click(stopSnakeGame);
-    $("#startSnake").click(startSnakeGame);
+    setMaxCoordinates(width, height);
+    $("#stopSnake").click(stop);
+    $("#startSnake").click(start);
 });
-
-
-function stopSnakeGame() {
-    $("#mySnakeCanvas").clearCanvas();
-    clearInterval(snaketimer); 
-}
-
-function startSnakeGame() {
-    initSnakeGame();
-    draw();
-    snaketimer = setInterval(function() {
-        move(lastPressedArrowKey);}, settings.SLEEPTIME); 
-}
-
-/**
-  @function prepareCanvas() -> void
-  @desc Haal de afmetingen van het canvas op en indien nodig pas deze aan
-        om de elementen mooi af te beelden, sla het max en min van de coordinaten op
-*/
-function prepareCanvas() {
-    getDimensionsCanvas();
-
-    //toekennen van max waarde die x of y kan hebben
-    xMax = width - settings.R;     
-    yMax = height - settings.R;    
-}
 
 /**
   @function getDimensionsCanvas() -> void
@@ -69,6 +42,38 @@ function prepareCanvas() {
 function getDimensionsCanvas() {
     width = $("#mySnakeCanvas").innerWidth();
     height = $("#mySnakeCanvas").innerHeight();
+}
+
+function stop() {
+    $("#mySnakeCanvas").clearCanvas();
+    clearInterval(snaketimer);
+    stopSnakeGame(); 
+}
+
+function start() {
+    initSnakeGame();
+    draw();
+    snaketimer = setInterval(function() {
+        updateSnakeGame();}, settings.SLEEPTIME); 
+}
+
+function updateSnakeGame() {
+	move(lastPressedArrowKey);
+	draw();
+	determineResult();
+}
+
+function determineResult(){
+	status = getGameStatus();
+	switch(status) {
+		case settings.WON:
+			drawGewonnen();
+			break;
+		case settings.LOST:
+			drawVerloren();
+			break;
+
+	}
 }
 
 /**
