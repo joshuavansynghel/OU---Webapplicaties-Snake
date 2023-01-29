@@ -3,8 +3,9 @@ import {Element} from "./element.js";
 
 /**
   @constructor Snake
-  @param {[Element] segments een array met aaneengesloten slangsegmenten
-                   Het laatste element van segments wordt de kop van de slang 
+  @param {array} segments een array met aaneengesloten slangsegmenten
+                   Het laatste element van segments wordt de kop van de slang
+  @param {string} direction richting van de slang 
 */ 
 function Snake(segments) {
     this.segments = segments;
@@ -23,7 +24,7 @@ Snake.prototype.getDirection = function() {
 /**
   @function setDirection(direction) -> void
   @desc Set een nieuwe richting aan de slang
-  @param {string} direction nieuwe richten van de slang 
+  @param {string} direction nieuwe richting van de slang 
 */
 Snake.prototype.setDirection = function(direction) {
     this.direction = direction;
@@ -33,13 +34,13 @@ Snake.prototype.setDirection = function(direction) {
   @function createStartSnake() -> Snake
   @desc Slang creëren, bestaande uit  twee segmenten, 
         in het midden van het veld
-  @return: slang volgens specificaties
+  @return {Object} snake een slang met gegeven kleur en coordinaten
 */
 export function createStartSnake() {
+    //bereken de wijdte en hoogte van canvas op basis van de
+    //variabelen en constanten in settings
     let width = settings.xMax + settings.R;
     let height = settings.yMax + settings.R;
-
-    //console.log("width:" + width + " and height: " + height);
 
     var segments   = [createSegment(width/2, height/2), 
                       createHead(width/2, height/2 - 2 * settings.R)];
