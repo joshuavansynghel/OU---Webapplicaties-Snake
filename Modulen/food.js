@@ -3,14 +3,14 @@ import {Element} from "./element.js";
 
 /**
   @function createFoods() -> array met food
-  @desc [Element] array van random verdeelde voedselpartikelen
-  @return [Element] array met food
+  @desc Aanmaken Array van voedselelementen die niet botst met de bestaande slang
+  @param {Object} snake de slang van het spel
+  @return {array} foods array met food elementen
 */
 export function createFoods(snake) {   
    var  i = 0,    
         food,
         foods = [];
-   console.log("snake:" + JSON.stringify(snake));
    while (i < settings.NUMFOODS ) {
      food = createFood(settings.XMIN + getRandomMultipleOfRadius(0, settings.xMax), 
                         settings.YMIN + getRandomMultipleOfRadius(0, settings.yMax));
@@ -42,7 +42,7 @@ function createFood(x, y) {
   @return {number} een random geheel getal x waarvoor geldt: min <= x <= max && (x % (2*R)) = 0
 */
 function getRandomMultipleOfRadius(min, max) {
-    var res;
+    let res;
 
     //genereer willekeurig getal dat deelbaar is door 2*R
     //dit zorgt ervoor dat x en y zo gekozen worden dat ze mooi op canvas worden afgebeeld
@@ -60,7 +60,8 @@ function getRandomMultipleOfRadius(min, max) {
   @throws {Error} Het eerste argument moet kleiner of gelijk aan het tweede argument zijn
 */
 function getRandomInt(min, max) {
-    var res;
+    let res;
+    
     if (isPosInteger(min) && isPosInteger(max) && min <= max) {
         res = Math.floor(Math.random() * (max - min + 1)) + min;
     }
