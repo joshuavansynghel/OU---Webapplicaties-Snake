@@ -8,14 +8,31 @@ var snake,
     snaketimer,                        // timer van de snake
     gameStatus = settings.INACTIVE;     // status van het spel
 
+
+/**
+ @function getSnakeSegments() -> [Element]
+ @desc get de segmenten waaruit de slang bestaat
+ @return {array} segments de segmenten waaruit slang bestaat
+*/
  export function getSnakeSegments() {
  	return snake.segments;
  }
 
+
+/**
+ @function getFoods() -> [Element]
+ @desc get food elementen van het spel
+ @return {array} foods de voedselelementen van het spel
+*/
  export function getFoods() {
  	return foods;
  }
 
+/**
+ @function getGameStatus() -> string
+ @desc get status van het spel
+ @return {string} gameStatus string die status beschrijft
+*/
  export function getGameStatus() {
     return gameStatus;
  } 
@@ -37,7 +54,6 @@ export function stopSnakeGame() {
   
   foods = [];
   gameStatus = settings.INACTIVE
-  //lastPressedArrowKey = settings.UP;
 }
 
 /**
@@ -61,7 +77,6 @@ export function initSnakeGame() {
         */
 		
 		snake = createStartSnake();
-        console.log("snake Init: " + snake);
         foods = createFoods(snake);
     }
 }
@@ -101,8 +116,6 @@ export function move(lastPressedArrowKey) {
 	}  
 }
 
-
-
 /**
   @function determineDirection() -> void
   @desc Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
@@ -116,8 +129,8 @@ function determineDirection(lastPressedArrowKey) {
 
 /**
   @function createNewHead() -> Element
-  @desc Bereken de positie van het nieuwe hoofd van de slang indien deze binnen
-        of buiten het canvas valt
+  @desc Maak een nieuw hoofd aan voor de slang op basis van de huidige richting
+        van de slang
   @return {Element} met straal R en color HEAD
 */
 export function createNewHead() {
@@ -193,6 +206,7 @@ function refitNewHeadToCanvas(element) {
             break;
     }
 }
+
 /**
   @function updateSnakeCoordinaten(newHead, foodCollision) -> void
   @desc Past coordinaten van de slang en reageer indien deze
@@ -213,7 +227,6 @@ function updateSnakeCoordinaten(newHead, foodCollision) {
     }
 }
 
-
 /**
   @function removeFood(x, y) -> void
   @desc Verwijder voedsel indien deze op een gegeven x en y coordinaat ligt
@@ -230,12 +243,3 @@ function removeFood(x, y) {
         } 
     } 
 } 
-
-/**
-  @function verloren() -> void
-  @desc Stop het spel en geef aan de gebruiker aan dat deze verloren is
-*/
-function verloren() {
-    stopGame();
-    drawVerloren();
-}

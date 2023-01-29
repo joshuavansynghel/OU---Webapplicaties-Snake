@@ -82,8 +82,8 @@ function determineResult(){
 */
 function draw() {
     var canvas = $("#mySnakeCanvas").clearCanvas();
-    drawElements(getSnakeSegments(), canvas);
     drawElements(getFoods(), canvas);
+    drawElements(getSnakeSegments(), canvas);
 }
 
 /**
