@@ -21,7 +21,7 @@ export function Element(radius, x, y, color) {
                     true indien wel
 */
 Element.prototype.collidesWithOneOf = function(elements) {
-    //console.log("elements: " + JSON.stringify(elements))
+    console.log("elements: " + JSON.stringify(elements))
     var xcoordinaat = this.x;
     var ycoordinaat = this.y;
     return elements.some(function(el) {
