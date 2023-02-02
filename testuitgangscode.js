@@ -43,25 +43,32 @@ QUnit.test( "updateSnakeCoordinaten ")
 QUnit.test( "test determineDirection met niet tegengestelde richtingen",
 	function( assert ) {
 		//initialiseer snake met default UP direction en lastpressed arrow key
-		createStartSnake();
+		snake = createStartSnake();
+		console.log("Waarde:  " + snake.getDirection())
+		
+		
 		lastPressedArrowKey = RIGHT;
+
+		console.log("Waarde:  " + lastPressedArrowKey )
 
 		//initialiseer variabele om vorige direction bij te houden
 		//Snake direction UP
 		var previousDirection = snake.getDirection();
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
+
+		console.log("Waarde:  " + snake.getDirection() )
 
 		assert.expect(4);
-		assert.equal(snake.getDirection(), lastPressedArrowKey,
+		assert.equal(snake.getDirection(), lastPressedArrowKey,   
 			"bij snake direction UP en lastPressedArrowKey RIGHT wijzigt direction naar lastPressedArrowKey");
-
+		
 		//snake direction RIGHT
 		snake.setDirection(RIGHT);
 		previousDirection = snake.getDirection();
 		lastPressedArrowKey = DOWN;
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.equal(snake.getDirection(), lastPressedArrowKey,
 			"bij snake direction RIGHT en lastPressedArrowKey DOWN wijzigt direction naar lastPressedArrowKey");
@@ -71,7 +78,7 @@ QUnit.test( "test determineDirection met niet tegengestelde richtingen",
 		previousDirection = snake.getDirection();
 		lastPressedArrowKey = LEFT;
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.equal(snake.getDirection(), lastPressedArrowKey,
 			"bij snake drection DOWN en lastPressedArrowKey LEFT wijzigt direction naar lastPressedArrowKey");
@@ -81,7 +88,7 @@ QUnit.test( "test determineDirection met niet tegengestelde richtingen",
 		previousDirection = snake.getDirection();
 		lastPressedArrowKey = UP;
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.equal(snake.getDirection(), lastPressedArrowKey,
 			"bij snake direction LEFT en lastPressedArrowKey UP wijzigt direction naar lastPressedArrowKey");
@@ -90,14 +97,14 @@ QUnit.test( "test determineDirection met niet tegengestelde richtingen",
 QUnit.test( "test determineDirection met tegengestelde richtingen",
 	function( assert ) {
 		//initialiseer snake met default UP direction en lastpressed arrow key
-		createStartSnake();
+		snake = createStartSnake();
 		lastPressedArrowKey = DOWN;
 
 		//initialiseer variabele om vorige direction bij te houden
 		//Snake direction UP
 		var previousDirection = snake.getDirection();
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.expect(4);
 		assert.equal(previousDirection, snake.getDirection(),
@@ -108,7 +115,7 @@ QUnit.test( "test determineDirection met tegengestelde richtingen",
 		previousDirection = snake.getDirection();
 		lastPressedArrowKey = LEFT;
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.equal(previousDirection, snake.getDirection(),
 			"bij snake direction RIGHT en lastPressedArrowKey LEFT blijft direction ongewijzigd");
@@ -118,7 +125,7 @@ QUnit.test( "test determineDirection met tegengestelde richtingen",
 		previousDirection = snake.getDirection();
 		lastPressedArrowKey = UP;
 
-		determineDirection();
+		determineDirection(lastPressedArrowKey);
 
 		assert.equal(previousDirection, snake.getDirection(),
 			"bij snake drection DOWN en lastPressedArrowKey UP blijft direction ongewijzigd");
@@ -135,7 +142,7 @@ QUnit.test( "test determineDirection met tegengestelde richtingen",
 QUnit.test( "test oppositeDirectionSnake met niet tegengestelde richtingen",
 	function( assert ) {
 		//initieer snake met default UP direction en lastpressed arrow key
-		createStartSnake();
+		snake = createStartSnake();
 		lastPressedArrowKey = RIGHT;
 
 		assert.expect(4);
@@ -164,29 +171,29 @@ QUnit.test( "test oppositeDirectionSnake met niet tegengestelde richtingen",
 QUnit.test( "test oppositeDirectionSnake met tegengestelde richtingen",
 	function( assert ) {
 		//initieer snake met default UP direction en lastpressed arrow key
-		createStartSnake();
+		snake = createStartSnake();
 		lastPressedArrowKey = DOWN;
 
 		assert.expect(4);
-		assert.equal(oppositeDirectionSnake(), true,
+		assert.equal(oppositeDirectionSnake(lastPressedArrowKey ), true,
 			"met snake UP is tegengestelde richting DOWN");
 
 		snake.setDirection(RIGHT);
 		lastPressedArrowKey = LEFT;
 
-		assert.equal(oppositeDirectionSnake(), true,
+		assert.equal(oppositeDirectionSnake(lastPressedArrowKey ), true,
 			"met snake RIGHT is tegengestelde richting LEFT");
 
 		snake.setDirection(DOWN);
 		lastPressedArrowKey = UP;
 
-		assert.equal(oppositeDirectionSnake(), true,
+		assert.equal(oppositeDirectionSnake(lastPressedArrowKey ), true,
 			"met snake DOWN is tegengestelde richting UP");
 
 		snake.setDirection(LEFT);
 		lastPressedArrowKey = RIGHT;
 
-		assert.equal(oppositeDirectionSnake(), true, 
+		assert.equal(oppositeDirectionSnake(lastPressedArrowKey ), true, 
 			"met snake LEFT is tegengestelde richting RIGHT");
 });
 
@@ -200,7 +207,7 @@ QUnit.test( "test createNewHead",
 		var currentHead;
 
 		//creeër nieuwe slang en sla huidig hoofd op in variabele
-		createStartSnake();
+		snake = createStartSnake();
 		currentHead = snake.segments.at(-1);
 
 		//maak een nieuw hoofd aan en sla dit ook op in een variabele
@@ -301,6 +308,7 @@ QUnit.test( "test elementOutOfBounds buiten canvas",
 QUnit.test( "test refitNewHeadToCanvas ",
 	function( assert ) {
 		//initialize variables
+		snake = createStartSnake();
 		xMax = 460;
 		yMax = 460;
 
@@ -309,21 +317,28 @@ QUnit.test( "test refitNewHeadToCanvas ",
 
 		lastPressedArrowKey = UP;
 		refitNewHeadToCanvas(elem);
-
+	
 		assert.expect(4);
-		assert.equal(elem.y, yMax, "indien UP moet y gelijk zijn aan yMax");
+		assert.equal(elem.y, yMax , "indien UP moet y gelijk zijn aan yMax");
+
+
+		//door aanmaken segmenten ipv elementen ligt de nadruk op de coordinaten
+		elem = createSegment(240, 370);
 
 		lastPressedArrowKey = RIGHT;
+		snake.setDirection(RIGHT);
 		refitNewHeadToCanvas(elem);
 
 		assert.equal(elem.x, XMIN, "indien RIGHT moet x gelijk zijn aan XMIN");
 
 		lastPressedArrowKey = DOWN;
+		snake.setDirection(DOWN);
 		refitNewHeadToCanvas(elem);
 
 		assert.equal(elem.y, YMIN, "indien DOWN moet y gelijk zijn aan YMIN");
 
 		lastPressedArrowKey = LEFT;
+		snake.setDirection(LEFT);
 		refitNewHeadToCanvas(elem);
 
 		assert.equal(elem.x, xMax, "indien LEFT moet x gelijk zijn aan xMax");
@@ -452,9 +467,9 @@ QUnit.test( "test collidesWithOneOf methode van Element object ",
 
 QUnit.test( "test createStartSnake", 
 	function( assert ) {
-		width = 400;
-		height = 400;
-		createStartSnake();
+		width = 450;
+		height = 450;
+		snake = createStartSnake();
 		assert.expect(8);
 		//alle testen voor het eerste segment van de slang
 		assert.equal(snake.segments[0].radius, R, "straal moet gelijk zijn aan constante R");
@@ -496,9 +511,14 @@ QUnit.test( "test drawElement",
 		console.log("canvas: " + canv);
 		canv.innerWidth = 460;
 		canv.innerHeight = 460;
+		
+		//Functie voor canvas
+		//var newCanvas = $('<canvas/>',{'class':'ditCanvas'}).width(460).height(460);
+	
+		
 		var food = createFood(40, 70);
 		assert.expect(3);
-		console.log("number of objects on canvas: " + canv.getObjects().length);
+		//console.log("number of objects on canvas: " + canv.getObjects()); 
 		//assert.equal(canv.getObjects().length, 0, "bij initialisatie canvas mag er nog geen element op staan");
 
 });
@@ -509,15 +529,16 @@ QUnit.test( "test createFoods",
 		//initialiseer hoogte en wijdte van canvas
 		width = 460;
 		height = 460;
+		snake = createStartSnake();
 
 		//initaliseer xMax en yMax
 		xMax = width - R;
 		yMax = height - R;
 
 		//creëer snake en pas daarna het voedsel
-		createStartSnake();
-		foods = [];
-		createFoods();
+		//snake = createStartSnake();
+		foods = createFoods(snake);
+	
 
 		//initaliseer variabelen om collisions te meten en variabele voor out of bounds
 		var foodCollision = false;
@@ -539,8 +560,7 @@ QUnit.test( "test createFoods",
 			"elementen uit foods mogen geen collision opleveren met andere elementen binnen foods");
 
 		//reset foods en maak deze opnieuw aan
-		foods = [];
-		createFoods();
+		foods = createFoods(snake);
 
 		//haal elementen foods 1 voor 1 uit array en controleer of deze botst met de slang
 		for (counter = 0; counter < NUMFOODS - 1; counter++) {
@@ -554,8 +574,7 @@ QUnit.test( "test createFoods",
 			"elementen uit foods mogen geen collision opleveren met andere elementen binnen foods");
 
 		//reset foods en maak deze opnieuw aan
-		foods = [];
-		createFoods();
+		foods = createFoods(snake);
 
 		//haal elementen foods 1 voor 1 uit array en controleer of deze binnen het canvas ligen
 		for (counter = 0; counter < NUMFOODS - 1; counter++) {
@@ -655,4 +674,555 @@ QUnit.test( "test isPosInteger met ongeldige waarden",
 
 //////////////////////aanvullinge Laurens 
 
-	///Qunit.test(   "     "  )   
+QUnit.test( "test setScore ",
+	function ( assert ) {
+		assert.expect(2);
+		setScore(10);
+		assert.equal(score, 10, "score moet gelijk zijn aan 10");
+		assert.notEqual(score, 2, "score is niet gelijk aan 2");
+});
+
+QUnit.test( "test getScore ",
+	function ( assert ) {
+		assert.expect(2);
+		score = 50;
+		assert.equal(getScore(), 50, "getScore moet gelijk zijn aan 50");
+		assert.notEqual(getScore(), 20, "getScore is niet gelijk aan 20");
+});
+
+
+QUnit.test( "test changeScore ",
+	function ( assert ) {
+		assert.expect(3);
+		score = 20;
+		changeScore();
+		assert.equal(score, 30, "na changeScore moet score gelijk zijn aan 30");
+		assert.notEqual(score, 20, "na changeScore is score niet gelijk aan 20");
+		assert.notEqual(score, 50, "na changeScore is score niet gelijk aan 50");
+});
+
+QUnit.test( "test resetScore ",
+	function ( assert ) {
+		assert.expect(3);
+		score = 20;
+		resetScore();
+		assert.equal(score, 0, "na resetScore moet score gelijk zijn aan 0");
+		assert.notEqual(score, 20, "na changeScore is score niet gelijk aan 20");
+		assert.notEqual(score, 10, "na changeScore is score niet gelijk aan 50");
+});
+
+
+QUnit.test( "test getNameWinner met string",
+	function ( assert ) {
+		assert.expect(3);
+		nameWinner = "jan";
+		assert.equal(getNameWinner(), "jan", "nameWinner moet gelijk zijn aan jan ");
+		assert.notEqual(getNameWinner(), "piet", "nameWinner is niet gelijk aan piet");
+		assert.notEqual(getNameWinner(), "", "nameWinner is niet gelijk aan een lege string waarde ");
+});
+
+
+
+QUnit.test( "test getNameWinner met lege string waarde",
+	function ( assert ) {
+		assert.expect(3);
+		nameWinner = "";
+		assert.equal(getNameWinner(), "", "nameWinner moet gelijk zijn aan lege waarde ");
+		assert.notEqual(getNameWinner(), "piet", "nameWinner is niet gelijk aan piet");
+		assert.notEqual(getNameWinner(), "alice", "nameWinner is niet gelijk aan alice ");
+});
+
+
+
+
+QUnit.test( "test setNameWinner met string",
+	function ( assert ) {
+		assert.expect(3);
+		setNameWinner("jan");
+		assert.equal(nameWinner, "jan", "nameWinner moet gelijk zijn aan jan")
+		assert.notEqual(nameWinner, "piet", "nameWinner is niet gelijk aan piet");
+		assert.notEqual(nameWinner, "", "nameWinner is niet gelijk aan een lege waarde")
+});
+
+QUnit.test( "test setNameWinner met lege string",
+	function ( assert ) {
+		assert.expect(3);
+		setNameWinner("");
+		assert.equal(nameWinner, "", "nameWinner moet gelijk zijn aan lege waarde")
+		assert.notEqual(nameWinner, "piet", "nameWinner is niet gelijk aan piet");
+		assert.notEqual(nameWinner, "jan", "nameWinner is niet gelijk aan jan")
+});
+
+
+
+QUnit.test( "test resetNameWinner ",
+	function ( assert ) {
+		assert.expect(3);
+		resetNameWinner();
+		assert.equal(nameWinner, undefined, "nameWinner moet gelijk zijn aan undefined");
+		assert.notEqual(nameWinner, "piet", "nameWinner is niet gelijk aan piet");
+		assert.notEqual(nameWinner, "", "nameWinner is niet gelijk aan een lege waarde");
+});
+
+
+
+QUnit.test( "test contstructor EntryScore ",
+	function ( assert ) {
+		assert.expect(2);
+		entryscore = new EntryScore("jan", 200);
+		assert.equal(entryscore.name, "jan", "name van EntryScore is jan");
+		assert.equal(entryscore.score, 200, "score van EntryScore is 200");
+		
+});
+
+
+
+
+
+
+
+
+
+
+//Scoreboard
+
+QUnit.test( "test setKeysScoreboard met gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", );
+		entriesScoreboardTest.set("placeTwo", );
+		entriesScoreboardTest.set("placeOne", );
+		setKeysScoreboard();
+		assert.deepEqual(entriesScoreboard, entriesScoreboardTest, "entriesScoreboard heeft 3 key: placeThree, placeTwo, placeOne");
+});
+
+
+QUnit.test( "test setKeysScoreboard met ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeTwo", );
+		entriesScoreboardTest.set("placeOne", );
+		setKeysScoreboard();
+		assert.notDeepEqual(entriesScoreboard, entriesScoreboardTest, "entriesScoreboard heeft 3 key: placeThree, placeTwo, placeOne");
+});
+
+QUnit.test( "test setEntriesScoreBoard op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		entriesLocalStorageTest = new Map();
+		entriesLocalStorageTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesLocalStorageTest.set("placeTwo", new EntryScore("Jan", 20));
+		entriesLocalStorageTest.set("placeOne", new EntryScore("Truus", 30));
+		setEntriesScoreBoard(entriesLocalStorageTest); 
+		assert.deepEqual(entriesScoreboard, entriesLocalStorageTest, "entriesScoreboard is gelijk aan entriesLocalStorageTest");
+});
+
+QUnit.test( "test setEntriesScoreBoard op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		entriesLocalStorageTest = new Map();
+		entriesLocalStorageTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesLocalStorageTest.set("placeTwo", new EntryScore("Jan", 20));
+		entriesLocalStorageTest.set("placeOne", new EntryScore("Truus", 30));
+		setEntriesScoreBoard(entriesLocalStorageTest); 
+		entriesLocalStorageTest.set("placeOne", new EntryScore("Johan", 30));
+		assert.notDeepEqual(entriesScoreboard, entriesLocalStorageTest, "entriesScoreboard is ongelijk aan entriesLocalStorageTest");
+});
+
+QUnit.test( "test completeEntriesScoreboard op gelijke testdata",
+	function ( assert ) {
+		assert.expect(2);
+		
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 20));
+		entriesScoreboardTest.set("placeOne", new EntryScore("",0));
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 20));
+		entriesScoreboard.set("placeOne",);
+		completeEntriesScoreboard(); 
+		
+		assert.deepEqual(entriesScoreboard, entriesScoreboardTest, "entriesScoreboard is gelijk aan entriesScoreboardTest");
+		assert.deepEqual(entriesScoreboard.get("placeOne"), new EntryScore("",0), "waarde van key placeOne is gelijk aan new EntryScore");
+});
+
+
+QUnit.test( "test completeEntriesScoreboard op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(2);
+	
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 20));
+		entriesScoreboardTest.set("placeOne",);
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 20));
+		entriesScoreboard.set("placeOne",);
+		completeEntriesScoreboard(); 
+		
+		assert.notDeepEqual(entriesScoreboard, entriesScoreboardTest, "entriesScoreboard is ongelijk aan entriesScoreboardTest");
+		assert.notDeepEqual(entriesScoreboard.get("placeOne"), entriesScoreboardTest.get("placeOne"),
+		"waarde van key placeOne in entriesScoreboard is ongelijk aan waarde van key placeOne in entriesScoreboardTest");
+});
+
+QUnit.test( "test addScoreBoardEntries op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		entriesLocalStorageTest = new Map();
+		entriesLocalStorageTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesLocalStorageTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesLocalStorageTest.set("placeOne", new EntryScore("Truus", 50));
+		
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeOne",new EntryScore("Truus", 50));
+		
+		addScoreBoardEntries(entriesLocalStorageTest); 
+		
+		assert.deepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is gelijk aan entriesScoreboardTest");
+});
+
+
+QUnit.test( "test addScoreBoardEntries op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		entriesLocalStorageTest = new Map();
+		entriesLocalStorageTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesLocalStorageTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesLocalStorageTest.set("placeOne", new EntryScore("Truus", 50));
+		
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Gert", 40)); //ongelijk
+		entriesScoreboardTest.set("placeOne",new EntryScore("Truus", 50));
+		
+		addScoreBoardEntries(entriesLocalStorageTest); 
+		
+		assert.notDeepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is ongelijk aan entriesScoreboardTest");
+});
+
+
+
+QUnit.test( "test getEntriesScoreBoard op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeOne",new EntryScore("Truus", 50));
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne",new EntryScore("Truus", 50));
+		
+		assert.deepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is gelijk aan entriesScoreboardTest");
+});
+
+
+QUnit.test( "test getEntriesScoreBoard op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeOne",new EntryScore("Truus", 60));
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne", new EntryScore("Alice", 30));
+		
+		assert.notDeepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is ongelijk aan entriesScoreboardTest");
+});
+
+
+QUnit.test( "test scoreIsNewHigh met gelijke testdata",
+	function ( assert ) {
+		assert.expect(6);
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 30));
+		entriesScoreboard.set("placeOne", new EntryScore("Alice", 50));
+		
+		setScore(-1);
+		assert.equal(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen high score"); 
+		setScore(0);
+		assert.equal(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen high score"); 
+		setScore(10);
+		assert.equal(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen high score"); 
+		setScore(20); 
+		assert.equal(scoreIsNewHigh(), "placeThree", "scoreIsNewHigh geeft placeThree"); 
+		setScore(40); 
+		assert.equal(scoreIsNewHigh(), "placeTwo", "scoreIsNewHigh geeft placeTwo"); 
+		setScore(60); 
+		assert.equal(scoreIsNewHigh(), "placeOne", "scoreIsNewHigh geeft placeOne"); 
+});
+
+
+QUnit.test( "test scoreIsNewHigh met ongelijke testdata",
+	function ( assert ) {
+		assert.expect(6);
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 30));
+		entriesScoreboard.set("placeOne", new EntryScore("Alice", 50));
+		
+		setScore(-1);
+		assert.notEqual(scoreIsNewHigh(), "placeThree", "scoreIsNewHigh geeft geen placeThree"); 
+		setScore(0);
+		assert.notEqual(scoreIsNewHigh(), "placeTwo", "scoreIsNewHigh geeft geen placeTwo"); 
+		setScore(10);
+		assert.notEqual(scoreIsNewHigh(), "placeOne", "scoreIsNewHigh geeft geen placeOne"); 
+		setScore(20); 
+		assert.notEqual(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen noHighscore"); 
+		setScore(40); 
+		assert.notEqual(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen noHighscore"); 
+		setScore(60); 
+		assert.notEqual(scoreIsNewHigh(), "noHighscore", "scoreIsNewHigh geeft geen noHighscore"); 
+});
+
+
+
+QUnit.test( "test adjustEntriesScoreboard op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne", new EntryScore("Johan", 50));
+		
+		adjustEntriesScoreboard("placeThree", "Alice", 30); 
+		adjustEntriesScoreboard("placeTwo", "Gert", 40); 
+		adjustEntriesScoreboard("placeOne", "Truus", 80); 
+		
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree", new EntryScore("Gert", 40));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Johan", 50));
+		entriesScoreboardTest.set("placeOne", new EntryScore("Truus", 80));
+		
+		assert.deepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is gelijk aan entriesScoreboardTest");
+});
+
+
+
+QUnit.test( "test adjustEntriesScoreboard op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+	
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne", new EntryScore("Johan", 50));
+		
+		adjustEntriesScoreboard("placeTwo", "Gert", 40); 
+	
+		entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeThree",  new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeOne", new EntryScore("Johan", 50));
+		
+		assert.notDeepEqual(getEntriesScoreBoard(), entriesScoreboardTest, "entriesScoreboard is ongelijk aan entriesScoreboardTest");
+});
+
+//Local Storage
+
+QUnit.test( "test getKeysLocalStorage op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		
+		localStorage.clear();
+		
+		localStorage.setItem("placeThree", "waarde3");
+		localStorage.setItem("placeTwo", "waarde2");
+		localStorage.setItem("placeOne", "waarde1");
+	
+		let keysLocalStorageTest = ["placeTwo", "placeThree", "placeOne"]; 
+		
+		let keysLocalStorage = getKeysLocalStorage();
+
+		assert.deepEqual(keysLocalStorage, keysLocalStorageTest,  "keysLocalStorage is gelijk aan keysLocalStorageTest");
+		
+		localStorage.clear();
+});
+
+
+QUnit.test( "test getKeysLocalStorage op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		
+		localStorage.clear();
+		
+		localStorage.setItem("placeThree", "waarde3");
+		localStorage.setItem("placeTwo", "waarde2");
+		localStorage.setItem("placeOne", "waarde1");
+	
+		let keysLocalStorageTest = ["placeTwo", "placeOne"]; 
+		
+		let keysLocalStorage = getKeysLocalStorage();
+
+		assert.notDeepEqual(keysLocalStorage, keysLocalStorageTest,  "keysLocalStorage is niet gelijk aan keysLocalStorageTest");
+		
+		localStorage.clear();
+});
+
+
+QUnit.test( "test filterKeysLocalStorage() op gelijke testdata",
+	function ( assert ) {
+		assert.expect(1);
+		
+		localStorage.clear();
+		
+		localStorage.setItem("placeThree", "waarde3");
+		localStorage.setItem("placeTwo", "waarde2");
+		localStorage.setItem("placeOne", "waarde1");
+		localStorage.setItem("boom", "");
+		localStorage.setItem("land", "");
+		localStorage.setItem("vliegtuig", "");
+	
+		let filteredDeysLocalStorageTest = ["placeTwo", "placeThree", "placeOne"]; 
+		
+		let keysLocalStorage = getKeysLocalStorage();
+		let filteredKeysLocalStorage =  filterKeysLocalStorage(keysLocalStorage);
+
+		assert.deepEqual(filteredKeysLocalStorage, filteredDeysLocalStorageTest,  "filteredKeysLocalStorage is gelijk aan filteredDeysLocalStorageTest");
+		
+		localStorage.clear();
+});
+
+
+QUnit.test( "test filterKeysLocalStorage() op ongelijke testdata",
+	function ( assert ) {
+		assert.expect(2);
+		
+		localStorage.clear();
+		
+		localStorage.setItem("placeThree", "waarde3");
+		localStorage.setItem("placeTwo", "waarde2");
+		localStorage.setItem("placeOne", "waarde1");
+		localStorage.setItem("boom", "");
+		localStorage.setItem("land", "");
+		localStorage.setItem("vliegtuig", "");
+	
+		let filteredDeysLocalStorageTest = ["boom", "vliegtuig", "placeTwo", "placeThree", "placeOne", "land"]; 
+	
+		let keysLocalStorage = getKeysLocalStorage();
+		let filteredKeysLocalStorage =  filterKeysLocalStorage(keysLocalStorage);
+
+		assert.deepEqual(keysLocalStorage, filteredDeysLocalStorageTest, "keysLocalStorage is gelijk aan filteredDeysLocalStorageTest");
+		assert.notDeepEqual(filteredKeysLocalStorage, filteredDeysLocalStorageTest,  "filteredKeysLocalStorage is niet gelijk aan filteredDeysLocalStorageTest");
+		
+		localStorage.clear();
+});
+
+
+QUnit.test( "test entriesLocalStorage() op gelijke testdata",
+	function ( assert ) {
+		assert.expect(7);
+		
+		localStorage.clear();
+		
+		let entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeOne", new EntryScore("Johan", 50));
+		
+		localStorage.setItem("placeThree", JSON.stringify(new EntryScore("Alice", 20)));
+		localStorage.setItem("placeTwo", JSON.stringify(new EntryScore("Jan", 40)));
+		localStorage.setItem("placeOne", JSON.stringify(new EntryScore("Johan", 50)));
+	
+		let keysLocalStorage = getKeysLocalStorage();
+		let filteredKeysLocalStorage =  filterKeysLocalStorage(keysLocalStorage);
+		let entries = getEntriesLocalStorage(filteredKeysLocalStorage);
+		
+		assert.equal(entries.size, entriesScoreboardTest.size, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").score, entriesScoreboardTest.get("placeOne").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").score, entriesScoreboardTest.get("placeTwo").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").score, entriesScoreboardTest.get("placeThree").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").name, entriesScoreboardTest.get("placeOne").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").name, entriesScoreboardTest.get("placeTwo").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").name, entriesScoreboardTest.get("placeThree").name, "entries is gelijk aan entriesScoreboardTest");
+
+		localStorage.clear();
+});
+
+
+
+QUnit.test( "test addEntriesToLocalStorage()",
+	function ( assert ) {
+		assert.expect(7);
+		
+		localStorage.clear();
+		
+		let entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeOne", new EntryScore("Johan", 50));
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne", new EntryScore("Johan", 50));
+		
+		addEntriesToLocalStorage(entriesScoreboard);
+	
+		let keysLocalStorage = getKeysLocalStorage();
+		let filteredKeysLocalStorage = filterKeysLocalStorage(keysLocalStorage);
+		let entries = getEntriesLocalStorage(filteredKeysLocalStorage);
+		
+		assert.equal(entries.size, entriesScoreboardTest.size, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").score, entriesScoreboardTest.get("placeOne").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").score, entriesScoreboardTest.get("placeTwo").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").score, entriesScoreboardTest.get("placeThree").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").name, entriesScoreboardTest.get("placeOne").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").name, entriesScoreboardTest.get("placeTwo").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").name, entriesScoreboardTest.get("placeThree").name, "entries is gelijk aan entriesScoreboardTest");
+		
+		localStorage.clear();
+});
+
+
+QUnit.test( "test getEntriesLocalStorage()",
+	function ( assert ) {
+		assert.expect(7);
+		
+		localStorage.clear();
+		
+		let entriesScoreboardTest = new Map();
+		entriesScoreboardTest.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboardTest.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboardTest.set("placeOne", new EntryScore("Johan", 50));
+		
+		setKeysScoreboard();
+		entriesScoreboard.set("placeThree", new EntryScore("Alice", 20));
+		entriesScoreboard.set("placeTwo", new EntryScore("Jan", 40));
+		entriesScoreboard.set("placeOne", new EntryScore("Johan", 50));
+		
+		addEntriesToLocalStorage(entriesScoreboard);
+
+		let entries = getEntriesLocalStorage(entriesScoreboard);
+		
+		assert.equal(entries.size, entriesScoreboardTest.size, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").score, entriesScoreboardTest.get("placeOne").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").score, entriesScoreboardTest.get("placeTwo").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").score, entriesScoreboardTest.get("placeThree").score, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeOne").name, entriesScoreboardTest.get("placeOne").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeTwo").name, entriesScoreboardTest.get("placeTwo").name, "entries is gelijk aan entriesScoreboardTest");
+		assert.equal(entries.get("placeThree").name, entriesScoreboardTest.get("placeThree").name, "entries is gelijk aan entriesScoreboardTest");
+		
+		localStorage.clear();
+});
