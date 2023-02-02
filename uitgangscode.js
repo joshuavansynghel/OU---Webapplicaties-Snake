@@ -4,7 +4,6 @@
  ***************************************************************************/
  
 
-
 /**export*/ const R        = 10,          // straal van een element
              STEP     = 2*R,         // stapgrootte
                                      // er moet gelden: WIDTH = HEIGHT
@@ -32,10 +31,10 @@
 
              WAITFORNAMEWINNER = 1000;
 
-/**export*/  var   xMax,
+/**export*/ var   xMax,
              yMax;
 
-/**export*/  function setMaxCoordinates(width, height) {
+/**export*/ function setMaxCoordinates(width, height) {
     xMax = width - R;
     yMax = height - R;
 }
@@ -51,7 +50,6 @@
  **                MODULE ELEMENT                                       **
  ***************************************************************************/
  
-
 /**
   @constructor Element
   @param radius straal
@@ -83,7 +81,6 @@ Element.prototype.collidesWithOneOf = function(elements) {
     });
 }
 
-
 /***************************************************************************
  **                MODULE ELEMENT                                       **
  ***************************************************************************/
@@ -93,9 +90,8 @@ Element.prototype.collidesWithOneOf = function(elements) {
 /***************************************************************************
  **                MODULE FOOD                                       **
  ***************************************************************************/
-
-/** 
-import * as settings from "./settings.js";
+/**
+import * as settings from "./js";
 import {Element} from "./element.js";
 */
 
@@ -109,11 +105,11 @@ import {Element} from "./element.js";
    var  i = 0,    
         food,
         foods = [];
-   //console.log("snake:" + JSON.stringify(snake));
+   console.log("snake:" + JSON.stringify(snake));
    while (i < NUMFOODS ) {
      food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), 
                         YMIN + getRandomMultipleOfRadius(0, yMax));
-    // console.log("food: " + food + " and snake: " + JSON.stringify(snake.segments));
+     console.log("food: " + food + " and snake: " + JSON.stringify(snake.segments));
      if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
        foods.push(food);
        i++
@@ -185,7 +181,6 @@ function isPosInteger(x) {
     return x >= 0 && Number.isInteger(x);
 }
  
- 
 /***************************************************************************
  **                MODULE FOOD                                         **
  ***************************************************************************/
@@ -199,10 +194,9 @@ function isPosInteger(x) {
  ***************************************************************************/
  
 /** 
-import * as settings from "./settings.js";
+import * as settings from "./js";
 import {Element} from "./element.js";
 */
-
 
 /**
   @constructor Snake
@@ -242,11 +236,14 @@ Snake.prototype.setDirection = function(direction) {
     let width = xMax + R;
     let height = yMax + R;
 
-    //console.log("width:" + width + " and height: " + height);
+    console.log("width:" + width + " and height: " + height);
 
     var segments   = [createSegment(width/2, height/2), 
                       createHead(width/2, height/2 - 2 * R)];
-    return new Snake(segments);
+    
+	//Verandering vanwege Snake
+	
+	return new Snake(segments);
     } 
     
 /**
@@ -291,7 +288,7 @@ var score = 0;
   @desc pas de score aan 
   @param {string} newScore de nieuwe waarde van de score
   */	
-function setScore(newScore){
+/**export*/ function setScore(newScore){
 	score = newScore;
 } 
 
@@ -301,7 +298,7 @@ function setScore(newScore){
   @desc geeft de huidige score van het spel
   @return {string} score de huidige score van het spel
   */	
-function getScore() { 
+/**export*/ function getScore() { 
 	return score; 
 }
 
@@ -310,7 +307,7 @@ function getScore() {
   @function changeScore() -> void
   @desc veranderd de score met 10 punten
   */	
-function changeScore() { 
+/**export*/ function changeScore() { 
 	score = score + 10;
 } 
 
@@ -319,7 +316,7 @@ function changeScore() {
   @function resetScore() -> void
   @desc reset de score van het spel naar 0
   */		
-function resetScore() { 
+/**export*/ function resetScore() { 
 	score = 0;
 } 
 
@@ -343,7 +340,7 @@ var nameWinner;
   @desc geeft de naam van de winnaar
   @return {string} de naam van de winnaar
   */		
-function getNameWinner() { 
+/**export*/ function getNameWinner() { 
 	return nameWinner; 
 } 
 
@@ -353,7 +350,7 @@ function getNameWinner() {
   @desc geeft de naam van de winnaar
   @param naam van de winnaar
   */		
-function setNameWinner(name) { 
+/**export*/ function setNameWinner(name) { 
 	nameWinner = name;
 } 
 
@@ -361,7 +358,7 @@ function setNameWinner(name) {
   @function resetNameWinner() -> void
   @desc zet de naam van de winnaar naar undefined
   */	
-function resetNameWinner() { 
+/**export*/ function resetNameWinner() { 
 	nameWinner = undefined;
 } 
 
@@ -376,7 +373,10 @@ function resetNameWinner() {
 /***************************************************************************
  **                MODUE SCOREBOARDENTRIES                                     **
  ***************************************************************************/
- 
+/**
+import {getNameWinner} from "./winnaar.js";
+import {getScore} from "./score.js";
+*/
 
 var entriesScoreboard;
 	
@@ -399,7 +399,7 @@ function EntryScore(name, scored) {
   vult de lege keys aan met entryScore objecten
   @param {map(String, EntryScore)} entriesLocalStorage scoreboard entries uit de local storage van de webbrowser
  */
-function addScoreBoardEntries(entriesLocalStorage){ 
+/**export*/ function addScoreBoardEntries(entriesLocalStorage){ 
 	setKeysScoreboard();
 	setEntriesScoreBoard(entriesLocalStorage);
 	completeEntriesScoreboard();
@@ -450,7 +450,7 @@ function completeEntriesScoreboard() {
   @function getEntriesScoreBoard() -> map(string, EntryScore)
   @desc geef de huidige entries van het scorebord. 
   */
-function getEntriesScoreBoard() { 
+/**export*/ function getEntriesScoreBoard() { 
 	return entriesScoreboard;
 }
 
@@ -462,12 +462,14 @@ function getEntriesScoreBoard() {
   @return {string} behaald plaats van de score in het scorebord, bij geen 
   high score is de returnwaarde "noHighscore".
   */	
-function scoreIsNewHigh() { 
+/**export*/ function scoreIsNewHigh() { 
 	let newPlace = "noHighscore"; 
+	let scored = getScore();
 	let intermediateScore = 0; 
+	console.log(entriesScoreboard);
 	entriesScoreboard.forEach((entry, key) => { 
 		let entryScore = entry.score; 
-		if (+score >= +entryScore && +entryScore >=  +intermediateScore){ 
+		if (+scored >= +entryScore && +entryScore >=  +intermediateScore){ 
 			intermediateScore = entryScore;
 			newPlace = key;	
 		}
@@ -483,14 +485,15 @@ function scoreIsNewHigh() {
   @param {string} place plek van de behaalde high score (placeOne, placeTwo, placeThree)
   @param {string} nameWinner naam van de winnaar
  */	
-function adjustEntriesScoreboard(newPlace, winner, scored) { 
+/**export*/ function adjustEntriesScoreboard(newPlace, winner, scored) { 
 		let place = newPlace;
 		let newScore = scored;
 		let nameWinner = winner;
 		let newEntry = new EntryScore(nameWinner, newScore); 
+		let entryPlaceTwo;
 		switch (place) {
 		case "placeOne": 
-		entryPlaceOne = entriesScoreboard.get("placeOne");
+		let entryPlaceOne = entriesScoreboard.get("placeOne");
 		entryPlaceTwo = entriesScoreboard.get("placeTwo");
 		entriesScoreboard.set("placeOne", newEntry);
 		entriesScoreboard.set("placeTwo",entryPlaceOne);
@@ -507,9 +510,8 @@ function adjustEntriesScoreboard(newPlace, winner, scored) {
 		} 
 } 
 
-
 /***************************************************************************
- **                MODUE SCOREBOARDENTRIES                                     **
+ **                MODULE SCOREBOARDENTRIES                                     **
  ***************************************************************************/
  
 
@@ -517,30 +519,42 @@ function adjustEntriesScoreboard(newPlace, winner, scored) {
 /***************************************************************************
  **                MODULE SNAKEGAME                                     **
  ***************************************************************************/
+
 /**
 import {Element} from "./element.js";
 import {createStartSnake, createHead} from "./snake.js";
 import {createFoods} from "./food.js";
-import * as settings from "./settings.js";
+import * as settings from "./js";
+import {changeScore} from "./score.js";
+import {setScore} from "./score.js";
+import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
+import {setScoreField}  from "./controllerDeux.js";
 */
-
 
 var snake,
     foods = [],                        // voedsel voor de slang
     snaketimer,                        // timer van de snake
     gameStatus = INACTIVE;     // status van het spel
 
+	/**export*/ var place;
+
+
  /**export*/ function getSnakeSegments() {
  	return snake.segments;
  }
 
-/**export*/ function getFoods() {
+ /**export*/ function getFoods() {
  	return foods;
  }
 
  /**export*/ function getGameStatus() {
     return gameStatus;
  } 
+ 
+  /**export*/ function setGameStatus(status) {
+    gameStatus = status;
+ } 
+
 
 /**
   @function stopGame() -> void
@@ -583,7 +597,7 @@ var snake,
         */
 		
 		snake = createStartSnake();
-        //console.log("snake Init: " + snake);
+        console.log("snake Init: " + snake);
         foods = createFoods(snake);
     }
 }
@@ -609,7 +623,7 @@ var snake,
 	let noFoodsLeft = foods.length <= 1;
 	
 	
-    //behandel mogelijke collisions van slang en voedsel
+      //behandel mogelijke collisions van slang en voedsel
 	if (!newHead.collidesWithOneOf(snake.segments)) {
     	foodCollision = newHead.collidesWithOneOf(foods);
     	updateSnakeCoordinaten(newHead, foodCollision);
@@ -627,6 +641,17 @@ var snake,
 	
 }
 
+/**
+  @function determineResultGame() -> void
+  @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
+*/
+function determineResultGame() { 
+	//let result = getScore();
+	place = scoreIsNewHigh();
+	if(!place.includes("noHighscore")) { 
+		setGameStatus(WON); 
+	} else {setGameStatus(LOST);}
+ } 
 
 
 /**
@@ -757,6 +782,8 @@ function removeFood(x, y) {
     } 
 } 
 
+
+
 /**
   @function verloren() -> void
   @desc Stop het spel en geef aan de gebruiker aan dat deze verloren is
@@ -767,10 +794,6 @@ function verloren() {
 }
 
 */ 
-
-
-
-
  
 /***************************************************************************
  **                  MODULE SNAKEGAME                                      **
@@ -784,14 +807,24 @@ function verloren() {
 /***************************************************************************
  **                  MODULE CONTROLLER                                      **
  ***************************************************************************/
-
-/*
-import * as settings from "./settings.js";
-import {setMaxCoordinates} from "./settings.js";
+/**
+import * as settings from "./js";
+import {setMaxCoordinates} from "./js";
 import {initSnakeGame,stopSnakeGame, move, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
- 
+import {place} from "./snakeGame.js";    
+	
+//Aanvullling Laurens	
+import {resetScore} from "./score.js";	
+import {resetNameWinner} from "./winnaar.js";
+
+
+import {enterWinnerNameTimer} from "./controllerDeux.js";	
+import {resetScoreField} from "./controllerDeux.js";	
+import {removeNameInputFields} from "./controllerDeux.js";	
+import {gewonnen} from "./controllerDeux.js";	
+import {initEntriesScoreBoard} from "./controllerDeux.js";	
 */
- 
+
 var width,                             // breedte van het tekenveld
     height,                            // hoogte van het tekenveld
 
@@ -835,8 +868,7 @@ function getDimensionsCanvas() {
 }
 
 function stop() {
-    console.log("hoi");
-	$("#mySnakeCanvas").clearCanvas();
+    $("#mySnakeCanvas").clearCanvas();
     clearInterval(snaketimer);
     stopSnakeGame(); 
 }
@@ -844,7 +876,7 @@ function stop() {
 function start() {
     initSnakeGame();
     
-	//Aanvulling Laurens
+		//Aanvulling Laurens
 		resetScore();
 		resetScoreField();
 		removeNameInputFields();
@@ -852,6 +884,7 @@ function start() {
 		clearInterval(enterWinnerNameTimer);
 		initEntriesScoreBoard();
 	//Aanvulling Laurens
+	
 	
 	draw();
     snaketimer = setInterval(function() {
@@ -865,7 +898,7 @@ function updateSnakeGame() {
 }
 
 function determineResult(){
-	status = getGameStatus();
+	let status = getGameStatus();
 	switch(status) {
 		case WON:
 			stop();
@@ -930,6 +963,7 @@ function drawVerloren() {
     });
 }
 
+
 function drawGewonnen() {
 	$("#mySnakeCanvas").drawImage({
 	source: 'newHighScore.jpg',
@@ -937,6 +971,7 @@ function drawGewonnen() {
 	scale : 1
 	});
 }
+
 
 
 
@@ -950,19 +985,38 @@ function drawGewonnen() {
 /***************************************************************************
  **                 MODULE CONTROLLERDEUX                                          **
  ***************************************************************************/
+/**
+import * as settings from "./js";
 
-var place;
-var enterWinnerNameTimer;
+import * as winnaar from "./winnaar.js";
+import * as score from "./score.js";
 
+import {setGameStatus}  from "./snakeGame.js";
+
+import {addScoreBoardEntries}  from "./EntriesScoreboard.js";
+import {getEntriesScoreBoard}  from "./EntriesScoreboard.js";
+import {adjustEntriesScoreboard}  from "./EntriesScoreboard.js";
+
+
+//import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
+
+import {getEntriesLocalStorage}  from "./LocalStorage.js";
+import {addEntriesToLocalStorage}  from "./LocalStorage.js";
+*/
+
+
+/**export*/ var enterWinnerNameTimer;
+
+///**export*/ var place;
 
 
 /**
   @function setScoreField() -> void
   @desc vul het veld score met de score in het spel
 */
-function setScoreField() {
-	score = getScore();
-	$(".scorefield4").text(score);
+/**export*/ function setScoreField() {
+	let scored = getScore();
+	$(".scorefield4").text(scored);
 } 
 
 /**
@@ -978,25 +1032,26 @@ function getScoreField() {
   @function resetScoreField() -> void
   @desc zet de waarde van het scoreveld naar 0
 */
-function resetScoreField() { 
+/**export*/ function resetScoreField() { 
 	$(".scorefield4").text(0);
 }
+
 
 /**
   @function determineResultGame() -> void
   @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
-*/
+
 function determineResultGame() { 
 	//let result = getScore();
 	place = scoreIsNewHigh();
 	if(!place.includes("noHighscore")) { 
-		gameStatus = WON; 
-	} else {gameStatus = LOST}
+		setGameStatus(WON); 
+	} else {setGameStatus(LOST);}
  } 
+*/
 
 
-
-function gewonnen(place) {
+/**export*/ function gewonnen(place) {
 	createNameInputFields();
 	enterWinnerNameTimer = setInterval(function() {
     procesScoreOfWinner(place);}, WAITFORNAMEWINNER);
@@ -1009,7 +1064,8 @@ function gewonnen(place) {
   @desc zet de entries van het scorebord in het scorebord van de applicatie. 
 */	
 function assignScoreBoardToFields() { 
-	entries = getEntriesScoreBoard();
+	let entries = getEntriesScoreBoard();
+	console.log(entries);
 	entries.forEach((entryScore, key) => { ; 
 		switch (key) {
 		case "placeOne": 
@@ -1048,8 +1104,8 @@ function createNameInputFields() {
   @desc creeer een witte ruimte 
 */
 function createWhiteSpaces() { 
-	labe1One = document.createElement("label");
-	labe1Two = document.createElement("label");
+	let labe1One = document.createElement("label");
+	let labe1Two = document.createElement("label");
 	$(".scoreboard").append(labe1One);
 	$(".scoreboard").append(labe1Two);
 } 
@@ -1060,7 +1116,7 @@ function createWhiteSpaces() {
   @desc creeer button zodat de winnaar zijn/haar naam kan valideren
 */
 function createEnterNameButton() { 
-	var button = document.createElement("button");
+	let button = document.createElement("button");
 	button.innerHTML = "Enter name";
 	$(".scoreboard").append(button);	
 	
@@ -1071,7 +1127,7 @@ function createEnterNameButton() {
   @desc creeer input veld zodat de winnaar zijn/haar naam kan invoeren
 */
 function createEnterNameField() { 
-	var nameField = document.createElement("INPUT");
+	let nameField = document.createElement("INPUT");
 	nameField.setAttribute("type", "text");
 	$(".scoreboard").append(nameField);
 } 
@@ -1083,12 +1139,12 @@ function createEnterNameField() {
   heeft ingevuld
 */
 function createEventlisterer() { 
-	buttonCollection = document.getElementsByTagName("button");
-	nameFieldCollection = document.getElementsByTagName("INPUT");
-	button = buttonCollection[0];
-	nameField = nameFieldCollection[2]
+	let buttonCollection = document.getElementsByTagName("button");
+	let nameFieldCollection = document.getElementsByTagName("INPUT");
+	let button = buttonCollection[0];
+	let nameField = nameFieldCollection[2]
 	buttonCollection[0].addEventListener("click", function() {
-		nameWinner = nameFieldCollection[2].value.substring(0, 13);
+		let nameWinner = nameFieldCollection[2].value.substring(0, 13);
 		setNameWinner(nameWinner);
 	});
 } 
@@ -1098,8 +1154,8 @@ function createEventlisterer() {
   @desc eventlistener geeft de naam in het inputveld waar de winnaar zijn/haar naam
   heeft ingevuld
 */
-function procesScoreOfWinner(place) { 
-	let newPlace = place;
+function procesScoreOfWinner(newplace) { 
+	let newPlace = newplace;
 	let scored = getScore();
 	let nameWinner = getNameWinner();
 	if (nameWinner !== undefined) { 
@@ -1117,11 +1173,12 @@ function procesScoreOfWinner(place) {
   pas de waarden in het scorebord aan in de applicatie, indien er een nieuwe 
   high score is. 
  */
-function changeScoreboard(newPlace, name, score) {
-	let place = newPlace;
+function changeScoreboard(newplace, name, score) {
+	let newPlace = newplace;
 	let nameWinner = name;
 	let scored = score;
-	adjustEntriesScoreboard(place, nameWinner, scored);
+	console.log("result: " + newPlace + nameWinner + scored);
+	adjustEntriesScoreboard(newPlace, nameWinner, scored);
 	assignScoreBoardToFields();
 }
 
@@ -1131,21 +1188,21 @@ function changeScoreboard(newPlace, name, score) {
   @desc creeer het inputveld, de button en de eventlisteren zodat
   de winnaar de naam kan invoeren. 
 */
-function removeNameInputFields() { 
-	labelCollection = document.getElementsByTagName("label");
-	labe1One = labelCollection[10];
-	labe1Two = labelCollection[11];
+/**export*/ function removeNameInputFields() { 
+	let labelCollection = document.getElementsByTagName("label");
+	let labe1One = labelCollection[10];
+	let labe1Two = labelCollection[11];
 	if(labe1One !== undefined && labe1Two !== undefined ) { 
 		labe1One.remove();
 		labe1Two.remove();
 	} 
-	buttonCollection = document.getElementsByTagName("button");
-	button = buttonCollection[0];
+	let buttonCollection = document.getElementsByTagName("button");
+	let button = buttonCollection[0];
 	if(button !== undefined) { 
 		button.remove();
 	} 
-	nameFieldCollection = document.getElementsByTagName("INPUT");
-	nameField = nameFieldCollection[2];
+	let nameFieldCollection = document.getElementsByTagName("INPUT");
+	let nameField = nameFieldCollection[2];
 	if(nameField !== undefined) { 
 		nameField.remove();
 	} 
@@ -1157,7 +1214,7 @@ function removeNameInputFields() {
   @desc voeg in de local storage aanwezige entries (met plek, score en naam winnaar)toe aan het scorebord 
   en aan de applicatie
 */
-function initEntriesScoreBoard() { 
+/**export*/ function initEntriesScoreBoard() { 
 	let entriesForScoreboard = getEntriesLocalStorage();
 	addScoreBoardEntries(entriesForScoreboard); 
 	assignScoreBoardToFields();
@@ -1184,6 +1241,7 @@ function addEntriesScoreboardToLocalStorage() {
  **                MODULE LOCALSTORAGE                                **
  ***************************************************************************/
 
+
 //localStorage.clear();
 
 /**
@@ -1204,7 +1262,7 @@ localStorage.setItem("gek",entry3);
   @function setScoreBoard() -> void
   @desc haal de aanwezig entries met naam en score uit de local storage van de webbrowser
  */
-function getEntriesLocalStorage(){ 
+/**export*/ function getEntriesLocalStorage(){ 
 	let keysLocalStorage = getKeysLocalStorage();
 	let filteredKeysLocalStorage = filterKeysLocalStorage(keysLocalStorage);
 	let localEntries = entriesLocalStorage(filteredKeysLocalStorage);
@@ -1274,11 +1332,13 @@ function entriesLocalStorage(filteredKeys) {
   @desc voeg de key/value paren van de map entriesScoreboard toe aan de local storage van de webbrowser,
   de EntrieScore object worden omgezet naar een string format. 
   */
-function addEntriesToLocalStorage() {
-	entriesScoreboard.forEach((entry, key) => { 
+/**export*/ function addEntriesToLocalStorage(scoreboard) {
+	let entries = scoreboard
+	entries.forEach((entry, key) => { 
 		localStorage.setItem(key, JSON.stringify(entry));
 	});
 } 
+
 
 
 /***************************************************************************

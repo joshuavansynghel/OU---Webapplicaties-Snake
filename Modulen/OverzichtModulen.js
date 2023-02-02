@@ -366,7 +366,7 @@ export function resetNameWinner() {
 /***************************************************************************
  **                MODUE SCOREBOARDENTRIES                                     **
  ***************************************************************************/
- import {getNameWinner} from "./winnaar.js";
+import {getNameWinner} from "./winnaar.js";
 import {getScore} from "./score.js";
 
 var entriesScoreboard;
