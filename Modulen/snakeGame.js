@@ -225,18 +225,18 @@ function refitNewHeadToCanvas(element) {
                                  anders true
 */
 function moveSnakeAndEatFood(newHead, foodCollision) {
-    snake.segments.at(-1).color = settings.SNAKE;
-    snake.segments.push(newHead);
+  snake.segments.at(-1).color = settings.SNAKE;
+  snake.segments.push(newHead);
 
-    //indien geen botsing met voedsel wordt laatste element van de staart verwijderd
-    if(!foodCollision) {
-        snake.segments.shift();
+  //indien geen botsing met voedsel wordt laatste element van de staart verwijderd
+  if(!foodCollision) {
+    snake.segments.shift();
 
     //indien botsing voedsel wordt voedsel verwijderd en score aangepast
-    } else {
-        removeFood(newHead.x, newHead.y);
-		changeScore();
-    }
+  } else {
+    removeFood(newHead.x, newHead.y);
+    changeScore();
+  }
 }
 
 /**
@@ -246,12 +246,12 @@ function moveSnakeAndEatFood(newHead, foodCollision) {
   @param {number} y - Het y-coordinaat
 */
 function removeFood(x, y) {
-    //ga alle elementen af in de array foods 
-    for(var i = 0; i < foods.length; i++){
+  //ga alle elementen af in de array foods 
+  for(var i = 0; i < foods.length; i++){
 
-        //verwijder voedsel dat op de meegegeven coordinaten staat
-        if (foods[i].x == x && foods[i].y == y) { 
-            foods.splice(i, 1); 
-        } 
+    //verwijder voedsel dat op de meegegeven coordinaten staat
+    if (foods[i].x == x && foods[i].y == y) { 
+      foods.splice(i, 1); 
     } 
+  } 
 }
