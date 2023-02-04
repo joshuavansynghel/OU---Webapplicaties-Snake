@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<title>Mijn spelletjessite</title>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Homepage waarin gebruiker de keuze kan maken van een klassiek spelletje" />
+		<meta name="author" content="Laurens de Roy, Joshua Van Synghel" />
+		<meta name="keywords" content="snake" />
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/stijl.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+		<script src="jsModules/jcanvas.js"></script>
+		<script type="module" src="jsModules/controller.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1>Mijn spelletjessite</h1>
+		</header>
+		<div class="page">
+				<aside class="sidebar">
+				<nav>
+					<h2>Mijn spelletjes</h2>
+					<ul class="menu" type="submit">
+						<li class="menu-item"><a href="index.html">Welkom</a></li>
+						<li class="menu-item"><a href ="">Inloggen</a></li>
+						<li class="menu-item"><a href ="snake.html">Snake</a></li>
+						<li class="menu-item"><a href ="">Boter-kaas-eieren</a></li>
+						<li class="menu-item"><a href ="">Sudoku</a></li>
+						<li class="menu-item"><a href ="">Master mind</a></li>
+						<li class="menu-item"><a href ="">Galgje</a></li>
+						<li class="menu-item"><a href ="">Cryptogramms</a></li>
+					</ul>
+				</nav>
+			</aside>
+			<article>
+				<h2>Snake</h2>
+				<section>
+					<input id="startSnake" type="submit" class="button" value="Start" />
+					<input id="stopSnake" type="submit" class="button" value="Stop" />
+				</section>
+				<canvas id="mySnakeCanvas" width="460" height="460"></canvas>
+			</article>
+			
+			<div class="scoreboard">  
+				<div class="scoreboard_name">Name</div> 
+				<div class="scoreboard_score">High Scores</div>
+				<label class="namefield1"></label> 
+				<label class="scorefield1"></label> 
+				<label class="namefield2"></label> 
+				<label class="scorefield2"></label> 
+				<label class="namefield3"></label> 
+				<label class="scorefield3"></label> 
+				<label class="whitespace"></label> 
+				<label class="whitespace"></label> 
+				<label class="score">Score</label> 
+				<label class="scorefield4"></label> 
+			</div>
+			
+		</div>
+	</body>
+</html>
+
