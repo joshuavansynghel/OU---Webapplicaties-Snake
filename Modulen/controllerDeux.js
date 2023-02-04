@@ -3,12 +3,9 @@ import * as settings from "./settings.js";
 import * as winnaar from "./winnaar.js";
 import * as score from "./score.js";
 
-import {setGameStatus}  from "./snakeGame.js";
-
 import {addScoreBoardEntries}  from "./EntriesScoreboard.js";
 import {getEntriesScoreBoard}  from "./EntriesScoreboard.js";
 import {adjustEntriesScoreboard}  from "./EntriesScoreboard.js";
-
 
 //import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
 
@@ -47,20 +44,6 @@ function getScoreField() {
 export function resetScoreField() { 
 	$(".scorefield4").text(0);
 }
-
-
-/**
-  @function determineResultGame() -> void
-  @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
-
-function determineResultGame() { 
-	//let result = getScore();
-	place = scoreIsNewHigh();
-	if(!place.includes("noHighscore")) { 
-		setGameStatus(settings.WON); 
-	} else {setGameStatus(settings.LOST);}
- } 
-*/
 
 
 export function gewonnen(place) {

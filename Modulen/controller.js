@@ -1,6 +1,6 @@
 import * as settings from "./settings.js";
 import {setMaxCoordinates} from "./settings.js";
-import {initSnakeGame,stopSnakeGame, move, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
+import {initSnakeGame, resetSnakeGame, moveSnakeAndResolveCollisions, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
 import {place} from "./snakeGame.js";    
 	
 //Aanvullling Laurens	
@@ -13,6 +13,7 @@ import {resetScoreField} from "./controllerDeux.js";
 import {removeNameInputFields} from "./controllerDeux.js";	
 import {gewonnen} from "./controllerDeux.js";	
 import {initEntriesScoreBoard} from "./controllerDeux.js";	
+import {setScoreField} from "./controllerDeux.js";  
 
 
 var width,                             // breedte van het tekenveld
@@ -60,7 +61,7 @@ function getDimensionsCanvas() {
 function stop() {
     $("#mySnakeCanvas").clearCanvas();
     clearInterval(snaketimer);
-    stopSnakeGame(); 
+    resetSnakeGame(); 
 }
 
 function start() {
@@ -82,9 +83,10 @@ function start() {
 }
 
 function updateSnakeGame() {
-	move(lastPressedArrowKey);
+	moveSnakeAndResolveCollisions(lastPressedArrowKey);
 	draw();
 	determineResult();
+    setScoreField();
 }
 
 function determineResult(){

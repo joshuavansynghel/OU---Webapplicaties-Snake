@@ -1,252 +1,249 @@
+/** @module snakeGame */
+
+import * as settings from "./settings.js";
 import {Element} from "./element.js";
 import {createStartSnake, createHead} from "./snake.js";
 import {createFoods} from "./food.js";
-import * as settings from "./settings.js";
-import {changeScore} from "./score.js";
-import {setScore} from "./score.js";
+import {changeScore, setScore} from "./score.js";
 import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
 import {setScoreField}  from "./controllerDeux.js";
-
 
 var snake,
     foods = [],                        // voedsel voor de slang
     snaketimer,                        // timer van de snake
     gameStatus = settings.INACTIVE;     // status van het spel
 
-	export var place;
-
-
- export function getSnakeSegments() {
- 	return snake.segments;
- }
-
- export function getFoods() {
- 	return foods;
- }
-
- export function getGameStatus() {
-    return gameStatus;
- } 
- 
-  export function setGameStatus(status) {
-    gameStatus = status;
- } 
-
+export var place;
 
 /**
-  @function stopGame() -> void
-  @desc Maak het canvas leeg, stop de timer, maak de array met voedsel leeg,
-        maak status gameGestart false en maak lastPressedKey terug naar boven
+  @function getSnakeSegments
+  @desc   Geef de segmenten van de slang
+  @return {array} Een array van segmenten
 */
-export function stopSnakeGame() { 
-  
-  /**
-  //Aanvulling Laurens 
-   clearInterval(enterWinnerNameTimer);
-   resetScore();
-   removeEnterNameFields();
-   //Aanvulling Laurens
-   **/
-  
-  foods = [];
-  gameStatus = settings.INACTIVE
-  //lastPressedArrowKey = settings.UP;
+export function getSnakeSegments() {
+  return snake.segments;
 }
 
 /**
-  @function init() -> void
-  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, 
-        cre\"eer een slang, genereer voedsel en teken deze elementen
-        en start de timer die de slang doet bewegen
+  @function getFoods
+  @desc   Geef de voedselelementen van het spel
+  @return {array} Een array van voedselelementen
 */
-export function initSnakeGame() {
-    if(gameStatus = settings.INACTIVE) { 
-        gameStatus = settings.ACTIVE;
-        
-        /**
-		//Aanvulling Laurens
-		fillScoreField();
-		removeEnterNameFields();
-		clearInterval(enterWinnerNameTimer);
-		resetNameWinner();
-		getContentLocalStorage();
-		//Aanvulling Laurens
-        */
-		
-		snake = createStartSnake();
-        console.log("snake Init: " + snake);
-        foods = createFoods(snake);
-    }
+export function getFoods() {
+  return foods;
 }
 
 /**
-  @function move() -> void
-  @desc Beweeg slang in de richting die het laatst met de pijljes werd gedrukt, corrigeer
-        indien deze uit het canvas zou verdwijnen en verlies het spel indien slang botst
-        met zichzelf
+  @function getGameStatus
+  @desc   Geef de status van het spel
+  @return {string} gameStatus - De status van het spel
 */
-export function move(lastPressedArrowKey) {
-    //bepaal de richting van de volgende kop van de slang 
-    determineDirection(lastPressedArrowKey);
-    let newHead = createNewHead();
-
-    //herbereken positie nieuwe head indien deze buiten het tekenveld zou vallen
-    if (elementOutOfBounds(newHead)) {
-        refitNewHeadToCanvas(newHead);
-    }
-	
-	//aanvulling Laurens 
-	let foodCollision = false; 
-	let noFoodsLeft = foods.length <= 1;
-	
-	
-      //behandel mogelijke collisions van slang en voedsel
-	if (!newHead.collidesWithOneOf(snake.segments)) {
-    	foodCollision = newHead.collidesWithOneOf(foods);
-    	updateSnakeCoordinaten(newHead, foodCollision);
-	} else {
-        //gameStatus = LOST - vewerkt in determineResultGame() 
-        determineResultGame();
-    }
-	if (foodCollision && noFoodsLeft) { 
-        //gameStatus = WON - vewerkt in determineResultGame()
-	    determineResultGame(); 
-	}  
-	if (foodCollision) { 
-		setScoreField();
-	} 
-	
-}
-
-/**
-  @function determineResultGame() -> void
-  @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
-*/
-function determineResultGame() { 
-	//let result = getScore();
-	place = scoreIsNewHigh();
-	if(!place.includes("noHighscore")) { 
-		setGameStatus(settings.WON); 
-	} else {setGameStatus(settings.LOST);}
- } 
-
-
-/**
-  @function determineDirection() -> void
-  @desc Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
-        de laatste drukte arrow key
-*/
-function determineDirection(lastPressedArrowKey) {
-    if (!oppositeDirectionSnake(lastPressedArrowKey)) { 
-        snake.setDirection(lastPressedArrowKey);
-    }
+export function getGameStatus() {
+  return gameStatus;
 } 
 
 /**
-  @function createNewHead() -> Element
-  @desc Bereken de positie van het nieuwe hoofd van de slang indien deze binnen
-        of buiten het canvas valt
-  @return {Element} met straal R en color HEAD
+  @function setGameStatus
+  @desc  Wijzig de status van het spel
+  @param {string} gameStatus - De nieuwe status van het spel
 */
-export function createNewHead() {
-    let currentHead = snake.segments.at(-1);
-    let newHead;
+export function setGameStatus(status) {
+  gameStatus = status;
+} 
 
-    //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
-    switch (snake.getDirection()) {
-        case settings.UP:
-            newHead = createHead(currentHead.x, currentHead.y - (2 * settings.R));
-            break;
-        case settings.DOWN:
-            newHead = createHead(currentHead.x, currentHead.y + (2 * settings.R));
-            break;
-        case settings.LEFT:
-            newHead = createHead(currentHead.x - (2 * settings.R), currentHead.y);
-            break;
-        case settings.RIGHT:
-            newHead = createHead(currentHead.x + (2 * settings.R), currentHead.y);
-            break;
-    }
-    return newHead;
+/**
+  @function resetSnakeGame
+  @desc Verwijder alle voedselelementen en zet gamestatus op inactief
+*/
+export function resetSnakeGame() { 
+  foods = [];
+  gameStatus = settings.INACTIVE
 }
 
 /**
-  @function oppositeDirectionSnake() -> boolean
-  @desc Geef aan of de huidige richting van de slang tegenovergesteld is
-        aan de laatste ingedrukte arrow key
+  @function initSnakeGame
+  @desc Activeer het spel indien dit inactief was en maak
+        de slang en het voedsel aan
+*/
+export function initSnakeGame() {
+  if(gameStatus = settings.INACTIVE) { 
+    gameStatus = settings.ACTIVE;
+    snake = createStartSnake();
+    foods = createFoods(snake);
+  }
+}
+
+/**
+  @function moveSnakeAndResolveCollisions
+  @desc  Beweeg slang in de richting die het laatst met de pijljes werd gedrukt, corrigeer
+         indien deze uit het canvas zou verdwijnen en verwerk alle acties indien
+         er een collision optreedt met zichzelf of foodelement
+  @param {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
+*/
+export function moveSnakeAndResolveCollisions(lastPressedArrowKey) {
+  //bepaal de richting van de volgende kop van de slang en maak nieuw hoofd aan
+  determineDirection(lastPressedArrowKey);
+  let newHead = createNewHead();
+
+  //herbereken positie nieuw head indien deze buiten het tekenveld zou vallen
+  if (elementOutOfBounds(newHead)) {
+    refitNewHeadToCanvas(newHead);
+  }
+  //klaar alle mogelijke collisions uit en update het spel
+  resolveCollisionsAndUpdateGame(newHead);
+}
+
+/**
+  @function resolveCollisionsAndUpdateGame
+  @desc  Detecteer alle mogelijke collisions:
+           - slang botst niet met zichzelf   -> beweeg slang en eet mogelijk foodelement
+           - slang botst met laatste voedsel -> spel gewonnen
+           - slang botst met zichzelf        -> spel verloren
+  @param {Object} newHead - Het nieuwe hoofd van de slang
+*/
+function resolveCollisionsAndUpdateGame(newHead) {
+  if (!newHead.collidesWithOneOf(snake.segments)) {
+    moveSnakeAndEatFood(newHead, newHead.collidesWithOneOf(foods));
+  } 
+  else if (foods.length = 0) {
+    determineResultGame();
+  } else {
+    determineResultGame();
+  }
+}
+
+/**
+  @function determineResultGame
+  @desc Bepaal of eindscore een nieuwe highscore is waarbij de speler wint en
+        zoniet verliest de gebruiker het spel
+*/
+function determineResultGame() { 
+  place = scoreIsNewHigh();
+  if(!place.includes("noHighscore")) { 
+    setGameStatus(settings.WON); 
+  } else {setGameStatus(settings.LOST);}
+} 
+
+/**
+  @function determineDirection
+  @desc  Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
+         de laatste drukte arrow key
+  @param {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
+*/
+function determineDirection(lastPressedArrowKey) {
+  if (!oppositeDirectionSnake(lastPressedArrowKey)) { 
+    snake.setDirection(lastPressedArrowKey);
+  }
+} 
+
+/**
+  @function createNewHead
+  @desc   Creëer een nieuw hoofd voor de slang op basis van de huidige richting
+          van de slang
+  @return {Element} Element met straal R en color HEAD
+*/
+export function createNewHead() {
+  let currentHead = snake.segments.at(-1);
+  let newHead;
+
+  //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
+  switch (snake.getDirection()) {
+    case settings.UP:
+      newHead = createHead(currentHead.x, currentHead.y - (2 * settings.R));
+      break;
+    case settings.DOWN:
+      newHead = createHead(currentHead.x, currentHead.y + (2 * settings.R));
+      break;
+    case settings.LEFT:
+      newHead = createHead(currentHead.x - (2 * settings.R), currentHead.y);
+      break;
+    case settings.RIGHT:
+      newHead = createHead(currentHead.x + (2 * settings.R), currentHead.y);
+      break;
+  }
+  return newHead;
+}
+
+/**
+  @function oppositeDirectionSnake
+  @desc   Geef aan of de huidige richting van de slang tegenovergesteld is
+          aan de laatste ingedrukte arrow key
+  @param  {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
   @return {boolean} false indien de huidige richting van slang en laatst gedrukte
                           arrowkey tegenovergesteld zijn
                     anders true
 */
 function oppositeDirectionSnake(lastPressedArrowKey) {
-    return (snake.getDirection() == settings.UP && lastPressedArrowKey == settings.DOWN) ||
-            (snake.getDirection() == settings.DOWN && lastPressedArrowKey == settings.UP) ||
-            (snake.getDirection() == settings.LEFT && lastPressedArrowKey == settings.RIGHT) ||
-            (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
+  return (snake.getDirection() == settings.UP && lastPressedArrowKey == settings.DOWN) ||
+         (snake.getDirection() == settings.DOWN && lastPressedArrowKey == settings.UP) ||
+         (snake.getDirection() == settings.LEFT && lastPressedArrowKey == settings.RIGHT) ||
+         (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
 }
 
 /**
-  @function elementOutOfBounds(element) -> boolean
-  @desc Geef aan of het element buiten het canvas valt
-  @param {Element} element een Element object
-  @return {boolean} false bij:
+  @function elementOutOfBounds
+  @desc   Geef aan of het element buiten het canvas valt
+  @param  {Object} element - Het te toetsen element
+  @return {boolean} true bij:
                        - element van buiten het canvas
-                    anders true
+                    anders false
 */
 function elementOutOfBounds(element) {
-    return element.x < settings.XMIN || element.x > settings.xMax ||
-            element.y < settings.YMIN || element.y > settings.yMax;
+  return element.x < settings.XMIN || element.x > settings.xMax ||
+         element.y < settings.YMIN || element.y > settings.yMax;
 }
 
-
 /**
-  @function refitNewHeadToCanvas(element) -> void
+  @function refitNewHeadToCanvas
   @desc Pas de x of y coordinaat van het nieuwe hoofd aan
         zodat deze weer binnen het canvas valt
-  @param {Element} element een Element object
+  @param {Element} element - Het te wijzigen element
 */
 function refitNewHeadToCanvas(element) {
-    switch (snake.getDirection()) {
-        case settings.UP:
-            element.y = settings.yMax;
-            break;
-        case settings.DOWN:
-            element.y = settings.YMIN;
-            break;
-        case settings.LEFT:
-            element.x = settings.xMax;
-            break;
-        case settings.RIGHT:
-            element.x = settings.XMIN;
-            break;
-    }
+  switch (snake.getDirection()) {
+    case settings.UP:
+      element.y = settings.yMax;
+      break;
+    case settings.DOWN:
+      element.y = settings.YMIN;
+      break;
+    case settings.LEFT:
+      element.x = settings.xMax;
+      break;
+    case settings.RIGHT:
+      element.x = settings.XMIN;
+      break;
+  }
 }
+
 /**
-  @function updateSnakeCoordinaten(newHead, foodCollision) -> void
-  @desc Past coordinaten van de slang en reageer indien deze
-        met voedsel botst
-  @param {Element} newHead de nieuwe head van de slang
+  @function moveSnakeAndEatFood
+  @desc  Past coordinaten van de slang en reageer indien deze
+         met voedsel botst
+  @param {Element} newHead - Het nieuwe hoofd van de slang
   @param {boolean} foodCollision false bij botsing nieuwe head met voedsel
                                  anders true
 */
-function updateSnakeCoordinaten(newHead, foodCollision) {
+function moveSnakeAndEatFood(newHead, foodCollision) {
     snake.segments.at(-1).color = settings.SNAKE;
     snake.segments.push(newHead);
+
+    //indien geen botsing met voedsel wordt laatste element van de staart verwijderd
     if(!foodCollision) {
         snake.segments.shift();
+
+    //indien botsing voedsel wordt voedsel verwijderd en score aangepast
     } else {
         removeFood(newHead.x, newHead.y);
-		//Aanvulling Laurens
 		changeScore();
     }
 }
 
-
 /**
-  @function removeFood(x, y) -> void
-  @desc Verwijder voedsel indien deze op een gegeven x en y coordinaat ligt
-  @param {number} x x-coordinaat
-  @param {number} y y-coordinaat
+  @function removeFood
+  @desc  Verwijder voedsel op een gegeven x en y coordinaat
+  @param {number} x - Het x-coordinaat
+  @param {number} y - Het y-coordinaat
 */
 function removeFood(x, y) {
     //ga alle elementen af in de array foods 
@@ -257,17 +254,4 @@ function removeFood(x, y) {
             foods.splice(i, 1); 
         } 
     } 
-} 
-
-
-
-/**
-  @function verloren() -> void
-  @desc Stop het spel en geef aan de gebruiker aan dat deze verloren is
-
-function verloren() {
-    stop();
-    drawVerloren();
 }
-
-*/ 
