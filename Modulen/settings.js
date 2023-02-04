@@ -1,3 +1,5 @@
+/** @module settings */
+
 export const R        = 10,          // straal van een element
              STEP     = 2*R,         // stapgrootte
                                      // er moet gelden: WIDTH = HEIGHT
@@ -28,7 +30,14 @@ export const R        = 10,          // straal van een element
 export var   xMax,
              yMax;
 
+/**
+  @function setMaxCoordinates
+  @desc  Toekennen van de maximale coordinaten die een
+         x of y coordinaat mag hebben aan lokale variabelen
+  @param {number} width - De wijdte van het canvas
+  @param {number} height - De hoogte van het canvas
+*/
 export function setMaxCoordinates(width, height) {
-    xMax = width - R;
-    yMax = height - R;
+  xMax = width - R;
+  yMax = height - R;
 }

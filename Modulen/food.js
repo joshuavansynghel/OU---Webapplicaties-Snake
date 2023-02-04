@@ -27,9 +27,9 @@ export function createFoods(snake) {
 /**
   @function createFood
   @desc    Creëert een food element met gegeven coördinaten
-  @param   {number} x - Een x-coordinaat middelpunt
-  @param   {number} y - Een y-coordinaart middelpunt
-  @return: {Element} Elemnt met straal R en color FOOD
+  @param   {number} x - Het x-coordinaat middelpunt
+  @param   {number} y - Het y-coordinaart middelpunt
+  @return: {Element} Element met straal R en color FOOD
 */
 function createFood(x, y) {
   return new Element(settings.R, x, y, settings.FOOD);
