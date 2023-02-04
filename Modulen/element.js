@@ -1,3 +1,5 @@
+/** @module element */
+
 /**
   @constructor Element
   @param {number} radius - De straal
