@@ -147,7 +147,7 @@ function drawElements(elements, canvas) {
 */
 function drawVerloren() {
     $("#mySnakeCanvas").drawImage({
-    source: 'sad_snake.jpg',
+    source: 'img/sad_snake.jpg',
     x: 210, y: 240,
     scale : 0.5
     });
@@ -156,7 +156,7 @@ function drawVerloren() {
 
 function drawGewonnen() {
 	$("#mySnakeCanvas").drawImage({
-	source: 'newHighScore.jpg',
+	source: 'img/newHighScore.jpg',
 	x: 230, y: 190,
 	scale : 1
 	});
