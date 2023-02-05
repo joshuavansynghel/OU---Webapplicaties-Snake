@@ -3,42 +3,47 @@
  **                MODULE SETTINGS                                       **
  ***************************************************************************/
  
-
-/**export*/ const R        = 10,          // straal van een element
-             STEP     = 2*R,         // stapgrootte
-                                     // er moet gelden: WIDTH = HEIGHT
-             LEFT     = "left",      // bewegingsrichtingen 
+const        R        = 10,            // straal van een element
+             STEP     = 2*R,           // stapgrootte
+                                       // er moet gelden: WIDTH = HEIGHT
+             LEFT     = "left",        // bewegingsrichtingen 
              RIGHT    = "right",
              UP       = "up",
              DOWN     = "down",
 
-             ACTIVE   = "active",
+             ACTIVE   = "active",      // statussen van het spel
              INACTIVE = "inactive",
              WON      = "won",
              LOST     = "lost",
 
 
-             NUMFOODS = 30,          // aantal voedselelementen 
+             NUMFOODS = 5,            // aantal voedselelementen 
 
-             XMIN     = R,           // minimale x waarde
-             YMIN     = R,           // minimale y waarde
+             XMIN     = R,             // minimale x waarde
+             YMIN     = R,             // minimale y waarde
       
-             SLEEPTIME = 200,        // aantal milliseconde voor de timer
+             SLEEPTIME = 200,          // aantal milliseconde voor de timer
 
-             SNAKE   = "DarkRed",    // kleur van een slangsegment
-             FOOD    = "Olive",      // kleur van voedsel
-             HEAD    = "DarkOrange", // kleur van de kop van de slang
+             SNAKE   = "DarkRed",      // kleur van een slangsegment
+             FOOD    = "Olive",        // kleur van voedsel
+             HEAD    = "DarkOrange",   // kleur van de kop van de slang
 
-             WAITFORNAMEWINNER = 1000;
+             WAITFORNAMEWINNER = 1000; // timer om input winnaar te controleren
 
-/**export*/ var   xMax,
-             yMax;
+var          xMax,                     // maximale x positie die element mag hebben
+             yMax;                     // maximale y positie die element mag hebben
 
-/**export*/ function setMaxCoordinates(width, height) {
-    xMax = width - R;
-    yMax = height - R;
+/**
+  @function setMaxCoordinates
+  @desc  Toekennen van de maximale coordinaten die een
+         x of y coordinaat mag hebben aan lokale variabelen
+  @param {number} width - De wijdte van het canvas
+  @param {number} height - De hoogte van het canvas
+*/
+function setMaxCoordinates(width, height) {
+  xMax = width - R;
+  yMax = height - R;
 }
-
 
 /***************************************************************************
  **                MODULE SETTINGS                                       **
@@ -52,33 +57,33 @@
  
 /**
   @constructor Element
-  @param radius straal
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaat middelpunt
-  @param {string} color kleur van het element
+  @param {number} radius - De straal
+  @param {number} x - Het x-coordinaat middelpunt
+  @param {number} y - Het y-coordinaat middelpunt
+  @param {string} color - De kleur van het element
 */ 
-/**export*/ function Element(radius, x, y, color) {
-    this.radius = radius;
-    this.x = x;
-    this.y = y;
-    this.color = color;
+function Element(radius, x, y, color) {
+  this.radius = radius;
+  this.x = x;
+  this.y = y;
+  this.color = color;
 }
 
+
 /**
-  @function collidesWithOneOf(elements) -> boolean
-  @desc Geef aan dit element bots met een andere array van elementen
-  @param [Element] elements een array van elementen
+  @function collidesWithOneOf
+  @desc   Geeft aan of dit element botst met een ander element uit de array
+  @param  {array} elements - Een array van elementen
   @return {boolean} false indien dit element niet botst met 1 van
                     de andere elementen in de array
                     true indien wel
 */
 Element.prototype.collidesWithOneOf = function(elements) {
-    //console.log("elements: " + JSON.stringify(elements))
-    var xcoordinaat = this.x;
-    var ycoordinaat = this.y;
-    return elements.some(function(el) {
-        return xcoordinaat == el.x && ycoordinaat == el.y;
-    });
+  var xcoordinaat = this.x;
+  var ycoordinaat = this.y;
+  return elements.some(function(el) {
+    return xcoordinaat == el.x && ycoordinaat == el.y;
+  });
 }
 
 /***************************************************************************
@@ -90,95 +95,97 @@ Element.prototype.collidesWithOneOf = function(elements) {
 /***************************************************************************
  **                MODULE FOOD                                       **
  ***************************************************************************/
-/**
-import * as settings from "./js";
-import {Element} from "./element.js";
-*/
-
 
 /**
-  @function createFoods() -> array met food
-  @desc [Element] array van random verdeelde voedselpartikelen
-  @return [Element] array met food
+  @function createFoods
+  @desc   Creëert een array van foodelementen die niet botst met bestaande slang
+  @param  {Object} snake - De slang van het spel
+  @return {array} Een array van foodelementen
 */
-/**export*/ function createFoods(snake) {   
-   var  i = 0,    
-        food,
-        foods = [];
-   console.log("snake:" + JSON.stringify(snake));
-   while (i < NUMFOODS ) {
-     food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), 
-                        YMIN + getRandomMultipleOfRadius(0, yMax));
-     console.log("food: " + food + " and snake: " + JSON.stringify(snake.segments));
-     if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
-       foods.push(food);
-       i++
-     }
-   }
-   return foods;  
+function createFoods(snake) {   
+  var  i = 0,    
+       food,
+       foods = [];
+  while (i < NUMFOODS ) {
+    food = createFood(XMIN + getRandomMultipleOfRadius(0, xMax), 
+                      YMIN + getRandomMultipleOfRadius(0, yMax));
+    if (!food.collidesWithOneOf(snake.segments) && !food.collidesWithOneOf(foods)) {
+      foods.push(food);
+      i++
+    }
+  }
+  return foods;  
 }
 
+
 /**
-  @function createFood(x,y) -> Element
-  @desc Voedselelement creeren op een bepaalde plaats
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaart middelpunt
-  @return: {Element} met straal R en color FOOD
+  @function createFood
+  @desc    Creëert een food element met gegeven coördinaten
+  @param   {number} x - Het x-coordinaat middelpunt
+  @param   {number} y - Het y-coordinaart middelpunt
+  @return: {Element} Element met straal R en color FOOD
 */
 function createFood(x, y) {
-    return new Element(R, x, y, FOOD);
+  return new Element(R, x, y, FOOD);
 }
 
+
 /**
-  @function getRandomMultipeOfRadius(min: number, max: number) -> number
-  @desc Creeren van random veelvoud van het dubbele van de radius in het interval [min, max]
-  @param {number} min een geheel getal als onderste grenswaarde
-  @param {number} max een geheel getal als bovenste grenswaarde (max > min)
-  @return {number} een random geheel getal x waarvoor geldt: min <= x <= max && (x % (2*R)) = 0
+  @function getRandomMultipeOfRadius
+  @desc   Creëren van random veelvoud van het dubbele van de radius in het interval [min, max]
+  @param  {number} min - Een geheel getal als onderste grenswaarde
+  @param  {number} max - Een geheel getal als bovenste grenswaarde (max > min)
+  @return {number} Random geheel getal x waarvoor geldt: 
+                                   - min <= x <= max 
+                                   - (x % (2*R)) = 0
 */
 function getRandomMultipleOfRadius(min, max) {
-    var res;
+  let res;
 
-    //genereer willekeurig getal dat deelbaar is door 2*R
-    //dit zorgt ervoor dat x en y zo gekozen worden dat ze mooi op canvas worden afgebeeld
-    res = getRandomInt(min, Math.floor(max / (2 * R))) * 2 * R;
-    return res;
+  //genereer willekeurig getal dat deelbaar is door 2*R
+  //dit zorgt ervoor dat x en y zo gekozen worden dat ze mooi op canvas worden afgebeeld
+  res = getRandomInt(min, Math.floor(max / (2 * R))) * 2 * R;
+  return res;
 }
 
+
 /**
-  @function getRandomInt(min: number, max: number) -> number
-  @desc Creeren van random geheel getal in het interval [min, max] 
-  @param {number} min een geheel getal als onderste grenswaarde
-  @param {number} max een geheel getal als bovenste grenswaarde (max > min)
-  @return {number} een random geheel getal x waarvoor geldt: min <= x <= max
+  @function getRandomInt
+  @desc   Creëren van random geheel getal in het interval [min, max] 
+  @param  {number} min - Een geheel getal als onderste grenswaarde
+  @param  {number} max - Een geheel getal als bovenste grenswaarde (max > min)
+  @return {number} Random geheel getal x waarvoor geldt: min <= x <= max
   @throws {Error} Het moeten gehele getallen van 0 of groter zijn
   @throws {Error} Het eerste argument moet kleiner of gelijk aan het tweede argument zijn
 */
 function getRandomInt(min, max) {
-    var res;
-    if (isPosInteger(min) && isPosInteger(max) && min <= max) {
-        res = Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    else if(!(isPosInteger(min) && isPosInteger(max))) {
-        throw Error("Het moeten gehele getallen van 0 of groter zijn");
-    }
-    else {
-        throw Error("Het eerste argument moet kleiner of gelijk aan het tweede argument zijn")
-    }
-    return res;
+  let res;
+  
+  //voorwaarde dat beide argumenten een positief geheel getal zijn en min <= max  
+  if (isPosInteger(min) && isPosInteger(max) && min <= max) {
+    res = Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  else if(!(isPosInteger(min) && isPosInteger(max))) {
+    throw Error("Het moeten gehele getallen van 0 of groter zijn");
+  }
+  else {
+    throw Error("Het eerste argument moet kleiner of gelijk aan het tweede argument zijn")
+  }
+  return res;
 }
 
+
 /**
-  @function isPosInteger(x: number) -> boolean
-  @desc Bepalen of het gaat om een positief geheel getal
-  @param {number} een getal
+  @function isPosInteger
+  @desc   Bepalen of het gaat om een positief geheel getal
+  @param  {number} een getal
   @return {boolean} false bij:
                        - geen getal
                        - kleiner dan 0;
                     anders true
 */
 function isPosInteger(x) {
-    return x >= 0 && Number.isInteger(x);
+  return x >= 0 && Number.isInteger(x);
 }
  
 /***************************************************************************
@@ -193,79 +200,71 @@ function isPosInteger(x) {
  **                MODULE SNAKE                                       **
  ***************************************************************************/
  
-/** 
-import * as settings from "./js";
-import {Element} from "./element.js";
-*/
-
 /**
   @constructor Snake
-  @param {[Element] segments een array met aaneengesloten slangsegmenten
-                   Het laatste element van segments wordt de kop van de slang 
+  @param {array} segments - Een array met aaneengesloten slangsegmenten
+                 Het laatste element van segments wordt de kop van de slang
 */ 
 function Snake(segments) {
-    this.segments = segments;
-    this.direction = UP;
+  this.segments = segments;
+  this.direction = UP;
 }
 
 /**
-  @function getDirection() -> string
-  @desc Get de huidige richting van de slang
-  @return {string} direction richting van de slang
+  @function getDirection
+  @desc   Geef de huidige richting van de slang
+  @return {string} De huidige  richting van de slang
 */
 Snake.prototype.getDirection = function() {
-    return this.direction;
+  return this.direction;
 }
 
 /**
-  @function setDirection(direction) -> void
-  @desc Set een nieuwe richting aan de slang
-  @param {string} direction nieuwe richten van de slang 
+  @function setDirection
+  @desc  Ken een nieuwe richting toe aan de slang
+  @param {string} direction - De nieuwe richting van de slang 
 */
 Snake.prototype.setDirection = function(direction) {
-    this.direction = direction;
+  this.direction = direction;
 }
 
 /**
-  @function createStartSnake() -> Snake
-  @desc Slang creëren, bestaande uit  twee segmenten, 
-        in het midden van het veld
-  @return: slang volgens specificaties
+  @function createStartSnake
+  @desc   Creëren van een slang met 2 segmenten in het midden
+          van het speelveld
+  @return {Object} Slang met gegeven kleur en positie
 */
-/**export*/ function createStartSnake() {
-    let width = xMax + R;
-    let height = yMax + R;
+function createStartSnake() {
+  //bereken de wijdte en hoogte van canvas op basis van de
+  //variabelen en constanten in settings
+  let width = xMax + R;
+  let height = yMax + R;
 
-    console.log("width:" + width + " and height: " + height);
-
-    var segments   = [createSegment(width/2, height/2), 
-                      createHead(width/2, height/2 - 2 * R)];
-    
-	//Verandering vanwege Snake
-	
-	return new Snake(segments);
-    } 
+  var segments   = [createSegment(width/2, height/2), 
+                    createHead(width/2, height/2 - 2 * R)];
+  return new Snake(segments);
+} 
     
 /**
-  @function createSegment(x,y) -> Element
-  @desc Slangsegment creeren op een bepaalde plaats
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaart middelpunt
-  @return: {Element} met straal R en color SNAKE
+  @function createSegment
+  @desc    Slangsegment creëren op een gegeven positie
+  @param   {number} x - Het x-coordinaat middelpunt
+  @param   {number} y - Het y-coordinaat middelpunt
+  @return: {Object} Element met straal R en color SNAKE
 */
 function createSegment(x, y) {
-    return new Element(R, x, y, SNAKE);
+  return new Element(R, x, y, SNAKE);
 }
 
 /**
   @function createHead(x,y) -> Element
-  @desc Head slang creeren op een bepaalde plaats
-  @param {number} x x-coordinaat middelpunt
-  @param {number} y y-coordinaart middelpunt
-  @return: {Element} met straal R en color HEAD
+  @desc    Slangenhoofd creëren op een gegeven positie
+  @param   {number} x - Het x-coordinaat middelpunt
+  @param   {number} y - Het y-coordinaart middelpunt
+  @return: {Object} Element met straal R en color HEAD
 */
-/**export*/ function createHead(x, y) {
-    return new Element(R, x, y, HEAD);
+function createHead(x, y) {
+  return new Element(R, x, y, HEAD);
 }
 
  
@@ -279,48 +278,45 @@ function createSegment(x, y) {
  **                 MODULE SCORE                                       **
  ***************************************************************************/
  
- 
-var score = 0; 
+var score = 0;          // de huidige score van het spel
 
 
 /**
-  @function  setScore(newScore) -> void
-  @desc pas de score aan 
-  @param {string} newScore de nieuwe waarde van de score
-  */	
-/**export*/ function setScore(newScore){
-	score = newScore;
+  @function setScore
+  @desc Pas de score aan naar een gegeven waarde
+  @param {string} newScore - De nieuwe waarde van de score
+  */  
+function setScore(newScore){
+  score = newScore;
 } 
 
 
 /**
-  @function getScore() -> string
-  @desc geeft de huidige score van het spel
-  @return {string} score de huidige score van het spel
-  */	
-/**export*/ function getScore() { 
-	return score; 
+  @function getScore
+  @desc Geef de huidige score van het spel
+  @return {string} De huidige score van het spel
+  */  
+function getScore() { 
+  return score; 
 }
 
 
 /**
-  @function changeScore() -> void
-  @desc veranderd de score met 10 punten
-  */	
-/**export*/ function changeScore() { 
-	score = score + 10;
+  @function changeScore
+  @desc Incrementeer de score met 10
+  */  
+function changeScore() { 
+  score = score + 10;
 } 
 
 
 /**
-  @function resetScore() -> void
-  @desc reset de score van het spel naar 0
-  */		
-/**export*/ function resetScore() { 
-	score = 0;
+  @function resetScore
+  @desc Reset de score van het spel naar 0
+  */    
+function resetScore() { 
+  score = 0;
 } 
-
-
 
 /***************************************************************************
  **                 MODULE SCORE                                       **
@@ -331,469 +327,460 @@ var score = 0;
  **                 MODULE WINNAAR                                 **
  ***************************************************************************/
  
-
-var nameWinner;
+var nameWinner;        // de naam van de winnaar
 
  
 /**
-  @function getNameWinner() -> string
-  @desc geeft de naam van de winnaar
-  @return {string} de naam van de winnaar
-  */		
-/**export*/ function getNameWinner() { 
-	return nameWinner; 
+  @function getNameWinner
+  @desc   Geef de naam van de winnaar
+  @return {string} De naam van de winnaar
+  */    
+function getNameWinner() { 
+  return nameWinner; 
 } 
 
 
 /**
-  @function resetScore() -> string
-  @desc geeft de naam van de winnaar
-  @param naam van de winnaar
-  */		
-/**export*/ function setNameWinner(name) { 
-	nameWinner = name;
+  @function setNameWinner
+  @desc  Verander de naam van de winnaar
+  @param {string} name - De naam van de winnaar
+  */    
+function setNameWinner(name) { 
+  nameWinner = name;
 } 
 
 /**
-  @function resetNameWinner() -> void
-  @desc zet de naam van de winnaar naar undefined
-  */	
-/**export*/ function resetNameWinner() { 
-	nameWinner = undefined;
+  @function resetNameWinner
+  @desc Zet de naam van de winnaar naar undefined
+  */  
+function resetNameWinner() { 
+  nameWinner = undefined;
 } 
-
-
 
 /***************************************************************************
- **                 MODULE WINNAAR                                 **
+ **                 MODULE WINNAAR                                        **
  ***************************************************************************/
  
 
 
 /***************************************************************************
- **                MODUE SCOREBOARDENTRIES                                     **
+ **                MODUE SCOREBOARDENTRIES                                **
  ***************************************************************************/
-/**
-import {getNameWinner} from "./winnaar.js";
-import {getScore} from "./score.js";
-*/
 
-var entriesScoreboard;
-	
+var entriesScoreboard;              // het scorebord met de 3 highscores
+  
 
 /**
-  Construcor EntryScore(name, scored)
-  @desc Creeer een entry voor het scoreboard
-  @param {string}name de naam van de winnaar
-  @param {string} scored de score van de winnaar 
+  @construcor EntryScore
+  @desc  Creëer een entry voor het scoreboard
+  @param {string} name - De naam van de winnaar
+  @param {string} scored - De score van de winnaar 
  */
 function EntryScore(name, scored) { 
-	this.name = name;
-	this.score = scored;
+  this.name = name;
+  this.score = scored;
 } 
 
 
 /**
-  @function addScoreBoardEntries(entriesLocalStorage) -> void
-  @desc geeft de variabele entriesScoreboard een lege map, kent aan deze map standaard keys toe, vult de map met de entries uit de local storage en 
-  vult de lege keys aan met entryScore objecten
-  @param {map(String, EntryScore)} entriesLocalStorage scoreboard entries uit de local storage van de webbrowser
+  @function getEntriesScoreBoard
+  @desc Geef de huidige entries van het scorebord.
+  @return {map} Een map met de entries van het scorebord 
+  */
+function getEntriesScoreBoard() { 
+  return entriesScoreboard;
+}
+
+
+/**
+  @function scoreIsNewHigh
+  @desc   Bepaal of de behaalde score een nieuwe high score is (top 3)
+  @return {string} Behaalde plaats van de score in het scorebord, 
+                   bij geen high score is de returnwaarde "noHighscore"
+  */  
+function scoreIsNewHigh() { 
+  let newPlace = "noHighscore"; 
+  let scored = getScore();
+  let intermediateScore = 0; 
+  entriesScoreboard.forEach((entry, key) => { 
+    let entryScore = entry.score; 
+    if (+scored >= +entryScore && +entryScore >=  +intermediateScore){ 
+      intermediateScore = entryScore;
+      newPlace = key; 
+    }
+  }); 
+  return newPlace;
+} 
+
+
+/**
+  @function adjustentriesScoreboard
+  @desc  Pas het scorebord aan met een nieuw behaalde high score
+  @param {string} newPlace - De nieuwe plaats van de behaalde high score (placeOne, placeTwo, placeThree)
+  @param {string} winner - De naam van de winnaar
+  @param {number} scored - De score van de winnaar
+ */ 
+function adjustEntriesScoreboard(newPlace, winner, scored) { 
+  let place = newPlace;
+  let newScore = scored;
+  let nameWinner = winner;
+  let newEntry = new EntryScore(nameWinner, newScore); 
+  let entryPlaceTwo;
+  switch (place) {
+    //bij nieuwe plaats 1 worden vorige plaats 1 en 2 doorgeschoven
+    case "placeOne": 
+      let entryPlaceOne = entriesScoreboard.get("placeOne");
+      entryPlaceTwo = entriesScoreboard.get("placeTwo");
+      entriesScoreboard.set("placeOne", newEntry);
+      entriesScoreboard.set("placeTwo",entryPlaceOne);
+      entriesScoreboard.set("placeThree",entryPlaceTwo);
+      break;
+
+    //bij nieuwe plaats 2 wordt vorige plaats 2 doorgeschoven
+    case "placeTwo": 
+      entryPlaceTwo = entriesScoreboard.get("placeTwo");
+      entriesScoreboard.set("placeTwo",newEntry);
+      entriesScoreboard.set("placeThree",entryPlaceTwo);
+      break;
+
+    //bij nieuwe plaats 3 wordt vorige plaats 3 vervangen
+    case "placeThree": 
+    entriesScoreboard.set("placeThree",newEntry);
+    break;
+  } 
+}
+
+
+/**
+  @function addScoreBoardEntries
+  @desc  Ken een nieuwe map toe aan de variabele entriesScoreboard voor de highscores, haal de entries
+         voor deze highscores uit de local storage, en vul deze aan in deze map. Indien geen highscores bekend
+         wordt een lege entry toegevoegd aan de map
+  @param {map} entriesLocalStorage - De scoreboard entries uit de local storage van de webbrowser
  */
-/**export*/ function addScoreBoardEntries(entriesLocalStorage){ 
-	setKeysScoreboard();
-	setEntriesScoreBoard(entriesLocalStorage);
-	completeEntriesScoreboard();
+function addScoreBoardEntries(entriesLocalStorage){ 
+  setKeysScoreboard();
+  setEntriesScoreBoard(entriesLocalStorage);
+  completeEntriesScoreboard();
 } 
 
 
 /**
-  @function setKeysScoreboard() -> void
-  @desc initieer de variabele met de entries van het scorebord, door toekenning van 
-  een Map()object met de vast keys: placeThree, placeTwo, placeOne. 
+  @function setKeysScoreboard
+  @desc Initialiseer de variabele met de entries van het scorebord, door toekenning van 
+        een Map()object met de vast keys: placeThree, placeTwo, placeOne 
   */
 function setKeysScoreboard() { 
-	entriesScoreboard = new Map();
-	entriesScoreboard.set("placeThree", );
-	entriesScoreboard.set("placeTwo", );
-	entriesScoreboard.set("placeOne", );
+  entriesScoreboard = new Map();
+  entriesScoreboard.set("placeThree", );
+  entriesScoreboard.set("placeTwo", );
+  entriesScoreboard.set("placeOne", );
 } 
 
 
 /**
-  @function setEntriesScoreBoard(entriesLocalStorage) -> void
-  @desc vul de entries
+  @function setEntriesScoreBoard
+  @desc Vul de map aan met de entries uit de local storage
+  @param {map} entriesLocalStorage - De scoreboard entries uit de local storage van de webbrowser
   */
 function setEntriesScoreBoard(entriesLocalStorage) { 
-	let entries = entriesLocalStorage;
-	entries.forEach((entryScore, key) => { 
-		entriesScoreboard.set(key, entryScore);
-	}); 
-}	
-	
+  let entries = entriesLocalStorage;
+  entries.forEach((entryScore, key) => { 
+    entriesScoreboard.set(key, entryScore);
+  }); 
+} 
+  
 
 /**
-  @function completeEntriesScoreboard() -> void
-  @desc als in de map entriesScoreboard één van de 3 keys geen EntrieScore als waarde heeft, 
-  dan krijgt deze key als waarde een EntryScore object zonder naam en met score 0. 
-  */	
+  @function completeEntriesScoreboard
+  @desc Als in de map entriesScoreboard één van de 3 keys geen EntrieScore als waarde heeft, 
+        dan krijgt deze key als waarde een EntryScore object zonder naam en met score 0
+  */  
 function completeEntriesScoreboard() { 
-	let places = ["placeOne", "placeTwo", "placeThree"];
-	places.forEach(key => { 
-		if(entriesScoreboard.get(key) === undefined) { 
-			entriesScoreboard.set(key, new EntryScore("", 0));
-		} 
-	});	
-} 
-
-
-/**
-  @function getEntriesScoreBoard() -> map(string, EntryScore)
-  @desc geef de huidige entries van het scorebord. 
-  */
-/**export*/ function getEntriesScoreBoard() { 
-	return entriesScoreboard;
-}
-
-
-/**
-  @function scoreIsNewHigh(score) -> string
-  @desc bepaal of de behaalde score een nieuwe high score is (top 3)
-  @param {string} behaalde score van de winnaar
-  @return {string} behaald plaats van de score in het scorebord, bij geen 
-  high score is de returnwaarde "noHighscore".
-  */	
-/**export*/ function scoreIsNewHigh() { 
-	let newPlace = "noHighscore"; 
-	let scored = getScore();
-	let intermediateScore = 0; 
-	console.log(entriesScoreboard);
-	entriesScoreboard.forEach((entry, key) => { 
-		let entryScore = entry.score; 
-		if (+scored >= +entryScore && +entryScore >=  +intermediateScore){ 
-			intermediateScore = entryScore;
-			newPlace = key;	
-		}
-	}); 
-	console.log(newPlace);
-	return newPlace;
-} 
-
-
-/**
-  @function adjustentriesScoreboard(place, nameWinner) -> void
-  @desc pas het score bord aan met een nieuw behaalde high score
-  @param {string} place plek van de behaalde high score (placeOne, placeTwo, placeThree)
-  @param {string} nameWinner naam van de winnaar
- */	
-/**export*/ function adjustEntriesScoreboard(newPlace, winner, scored) { 
-		let place = newPlace;
-		let newScore = scored;
-		let nameWinner = winner;
-		let newEntry = new EntryScore(nameWinner, newScore); 
-		let entryPlaceTwo;
-		switch (place) {
-		case "placeOne": 
-		let entryPlaceOne = entriesScoreboard.get("placeOne");
-		entryPlaceTwo = entriesScoreboard.get("placeTwo");
-		entriesScoreboard.set("placeOne", newEntry);
-		entriesScoreboard.set("placeTwo",entryPlaceOne);
-		entriesScoreboard.set("placeThree",entryPlaceTwo);
-		break;
-		case "placeTwo": 
-		entryPlaceTwo = entriesScoreboard.get("placeTwo");
-		entriesScoreboard.set("placeTwo",newEntry);
-		entriesScoreboard.set("placeThree",entryPlaceTwo);
-		break;
-		case "placeThree": 
-		entriesScoreboard.set("placeThree",newEntry);
-		break;
-		} 
-} 
+  let places = ["placeOne", "placeTwo", "placeThree"];
+  places.forEach(key => { 
+    if(entriesScoreboard.get(key) === undefined) { 
+      entriesScoreboard.set(key, new EntryScore("", 0));
+    } 
+  }); 
+}  
 
 /***************************************************************************
- **                MODULE SCOREBOARDENTRIES                                     **
+ **                MODULE SCOREBOARDENTRIES                               **
  ***************************************************************************/
  
 
  
 /***************************************************************************
- **                MODULE SNAKEGAME                                     **
+ **                MODULE SNAKEGAME                                       **
  ***************************************************************************/
 
-/**
-import {Element} from "./element.js";
-import {createStartSnake, createHead} from "./snake.js";
-import {createFoods} from "./food.js";
-import * as settings from "./js";
-import {changeScore} from "./score.js";
-import {setScore} from "./score.js";
-import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
-import {setScoreField}  from "./controllerDeux.js";
-*/
-
-var snake,
-    foods = [],                        // voedsel voor de slang
-    snaketimer,                        // timer van de snake
+var snake,                              // de slang
+    foods = [],                         // voedsel voor de slang
+    snaketimer,                         // timer van de snake
     gameStatus = INACTIVE;     // status van het spel
 
-	/**export*/ var place;
-
-
- /**export*/ function getSnakeSegments() {
- 	return snake.segments;
- }
-
- /**export*/ function getFoods() {
- 	return foods;
- }
-
- /**export*/ function getGameStatus() {
-    return gameStatus;
- } 
- 
-  /**export*/ function setGameStatus(status) {
-    gameStatus = status;
- } 
+var place;
 
 
 /**
-  @function stopGame() -> void
-  @desc Maak het canvas leeg, stop de timer, maak de array met voedsel leeg,
-        maak status gameGestart false en maak lastPressedKey terug naar boven
+  @function getSnakeSegments
+  @desc   Geef de segmenten van de slang
+  @return {array} Een array van segmenten
 */
-/**export*/ function stopSnakeGame() { 
-  
-  /**
-  //Aanvulling Laurens 
-   clearInterval(enterWinnerNameTimer);
-   resetScore();
-   removeEnterNameFields();
-   //Aanvulling Laurens
-   **/
-  
-  foods = [];
-  gameStatus = INACTIVE
-  //lastPressedArrowKey = UP;
+function getSnakeSegments() {
+  return snake.segments;
+}
+
+
+/**
+  @function getFoods
+  @desc   Geef de voedselelementen van het spel
+  @return {array} Een array van voedselelementen
+*/
+function getFoods() {
+  return foods;
 }
 
 /**
-  @function init() -> void
-  @desc Haal eventueel bestaand voedsel en een bestaande slang weg, 
-        cre\"eer een slang, genereer voedsel en teken deze elementen
-        en start de timer die de slang doet bewegen
+  @function getGameStatus
+  @desc   Geef de status van het spel
+  @return {string} De status van het spel
 */
-/**export*/ function initSnakeGame() {
-    if(gameStatus = INACTIVE) { 
-        gameStatus = ACTIVE;
-        
-        /**
-		//Aanvulling Laurens
-		fillScoreField();
-		removeEnterNameFields();
-		clearInterval(enterWinnerNameTimer);
-		resetNameWinner();
-		getContentLocalStorage();
-		//Aanvulling Laurens
-        */
-		
-		snake = createStartSnake();
-        console.log("snake Init: " + snake);
-        foods = createFoods(snake);
-    }
-}
-
-/**
-  @function move() -> void
-  @desc Beweeg slang in de richting die het laatst met de pijljes werd gedrukt, corrigeer
-        indien deze uit het canvas zou verdwijnen en verlies het spel indien slang botst
-        met zichzelf
-*/
-/**export*/ function move(lastPressedArrowKey) {
-    //bepaal de richting van de volgende kop van de slang 
-    determineDirection(lastPressedArrowKey);
-    let newHead = createNewHead();
-
-    //herbereken positie nieuwe head indien deze buiten het tekenveld zou vallen
-    if (elementOutOfBounds(newHead)) {
-        refitNewHeadToCanvas(newHead);
-    }
-	
-	//aanvulling Laurens 
-	let foodCollision = false; 
-	let noFoodsLeft = foods.length <= 1;
-	
-	
-      //behandel mogelijke collisions van slang en voedsel
-	if (!newHead.collidesWithOneOf(snake.segments)) {
-    	foodCollision = newHead.collidesWithOneOf(foods);
-    	updateSnakeCoordinaten(newHead, foodCollision);
-	} else {
-        //gameStatus = LOST - vewerkt in determineResultGame() 
-        determineResultGame();
-    }
-	if (foodCollision && noFoodsLeft) { 
-        //gameStatus = WON - vewerkt in determineResultGame()
-	    determineResultGame(); 
-	}  
-	if (foodCollision) { 
-		setScoreField();
-	} 
-	
-}
-
-/**
-  @function determineResultGame() -> void
-  @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
-*/
-function determineResultGame() { 
-	//let result = getScore();
-	place = scoreIsNewHigh();
-	if(!place.includes("noHighscore")) { 
-		setGameStatus(WON); 
-	} else {setGameStatus(LOST);}
- } 
-
-
-/**
-  @function determineDirection() -> void
-  @desc Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
-        de laatste drukte arrow key
-*/
-function determineDirection(lastPressedArrowKey) {
-    if (!oppositeDirectionSnake(lastPressedArrowKey)) { 
-        snake.setDirection(lastPressedArrowKey);
-    }
+function getGameStatus() {
+  return gameStatus;
 } 
 
-/**
-  @function createNewHead() -> Element
-  @desc Bereken de positie van het nieuwe hoofd van de slang indien deze binnen
-        of buiten het canvas valt
-  @return {Element} met straal R en color HEAD
-*/
-/**export*/ function createNewHead() {
-    let currentHead = snake.segments.at(-1);
-    let newHead;
 
-    //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
-    switch (snake.getDirection()) {
-        case UP:
-            newHead = createHead(currentHead.x, currentHead.y - (2 * R));
-            break;
-        case DOWN:
-            newHead = createHead(currentHead.x, currentHead.y + (2 * R));
-            break;
-        case LEFT:
-            newHead = createHead(currentHead.x - (2 * R), currentHead.y);
-            break;
-        case RIGHT:
-            newHead = createHead(currentHead.x + (2 * R), currentHead.y);
-            break;
-    }
-    return newHead;
+/**
+  @function setGameStatus
+  @desc  Wijzig de status van het spel
+  @param {string} gameStatus - De nieuwe status van het spel
+*/
+function setGameStatus(status) {
+  gameStatus = status;
+} 
+
+
+/**
+  @function resetSnakeGame
+  @desc Verwijder alle voedselelementen en zet gamestatus op inactief
+*/
+function resetSnakeGame() { 
+  foods = [];
+  gameStatus = INACTIVE
 }
 
+
 /**
-  @function oppositeDirectionSnake() -> boolean
-  @desc Geef aan of de huidige richting van de slang tegenovergesteld is
-        aan de laatste ingedrukte arrow key
+  @function initSnakeGame
+  @desc Activeer het spel indien dit inactief was en maak
+        de slang en het voedsel aan
+*/
+function initSnakeGame() {
+  if(gameStatus = INACTIVE) { 
+    gameStatus = ACTIVE;
+    snake = createStartSnake();
+    foods = createFoods(snake);
+  }
+}
+
+
+/**
+  @function moveSnakeAndResolveCollisions
+  @desc  Beweeg slang in de richting die het laatst met de pijljes werd gedrukt, corrigeer
+         indien deze uit het canvas zou verdwijnen en verwerk alle acties indien
+         er een collision optreedt met zichzelf of foodelement
+  @param {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
+*/
+function moveSnakeAndResolveCollisions(lastPressedArrowKey) {
+  //bepaal de richting van de volgende kop van de slang en maak nieuw hoofd aan
+  determineDirection(lastPressedArrowKey);
+  let newHead = createNewHead();
+
+  //herbereken positie nieuw head indien deze buiten het tekenveld zou vallen
+  if (elementOutOfBounds(newHead)) {
+    refitNewHeadToCanvas(newHead);
+  }
+  //klaar alle mogelijke collisions uit en update het spel
+  resolveCollisionsAndUpdateGame(newHead);
+}
+
+
+/**
+  @function resolveCollisionsAndUpdateGame
+  @desc  Detecteer alle mogelijke collisions:
+           - slang botst niet met zichzelf   -> beweeg slang en eet mogelijk foodelement
+           - slang botst met laatste voedsel -> spel gewonnen
+           - slang botst met zichzelf        -> spel verloren
+  @param {Object} newHead - Het nieuwe hoofd van de slang
+*/
+function resolveCollisionsAndUpdateGame(newHead) {
+  if (!newHead.collidesWithOneOf(snake.segments)) {
+    //beweeg de slang indien die niet botst met zichzelf
+    moveSnakeAndEatFood(newHead, newHead.collidesWithOneOf(foods));
+
+    //het spel is gewonnen indien al het voedsel is opgegeten
+    if (foods.length == 0) {
+      determineResultGame();
+    }
+  // indien slang botst met zichzelf is spel verloren
+  } else {
+    determineResultGame();
+  }
+}
+
+
+/**
+  @function determineResultGame
+  @desc Bepaal of eindscore een nieuwe highscore is waarbij de speler wint en
+        zoniet verliest de gebruiker het spel
+*/
+function determineResultGame() { 
+  place = scoreIsNewHigh();
+  if(!place.includes("noHighscore")) { 
+    setGameStatus(WON); 
+  } else {setGameStatus(LOST);}
+} 
+
+
+/**
+  @function determineDirection
+  @desc  Wijzig de richting van de slang indien deze niet tegenovergesteld is met 
+         de laatste drukte arrow key
+  @param {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
+*/
+function determineDirection(lastPressedArrowKey) {
+  if (!oppositeDirectionSnake(lastPressedArrowKey)) { 
+    snake.setDirection(lastPressedArrowKey);
+  }
+} 
+
+
+/**
+  @function createNewHead
+  @desc   Creëer een nieuw hoofd voor de slang op basis van de huidige richting
+          van de slang
+  @return {Object} Element met straal R en color HEAD
+*/
+function createNewHead() {
+  let currentHead = snake.segments.at(-1);
+  let newHead;
+
+  //maak een nieuwe head aan op basis van laatst ingedrukte arrow key
+  switch (snake.getDirection()) {
+    case UP:
+      newHead = createHead(currentHead.x, currentHead.y - (2 * R));
+      break;
+    case DOWN:
+      newHead = createHead(currentHead.x, currentHead.y + (2 * R));
+      break;
+    case LEFT:
+      newHead = createHead(currentHead.x - (2 * R), currentHead.y);
+      break;
+    case RIGHT:
+      newHead = createHead(currentHead.x + (2 * R), currentHead.y);
+      break;
+  }
+  return newHead; 
+}
+
+
+/**
+  @function oppositeDirectionSnake
+  @desc   Geef aan of de huidige richting van de slang tegenovergesteld is
+          aan de laatste ingedrukte arrow key
+  @param  {string} lastPressedArrowKey - De arrowkey die de gebruiker het laatst heeft ingedrukt
   @return {boolean} false indien de huidige richting van slang en laatst gedrukte
                           arrowkey tegenovergesteld zijn
                     anders true
 */
 function oppositeDirectionSnake(lastPressedArrowKey) {
-    return (snake.getDirection() == UP && lastPressedArrowKey == DOWN) ||
-            (snake.getDirection() == DOWN && lastPressedArrowKey == UP) ||
-            (snake.getDirection() == LEFT && lastPressedArrowKey == RIGHT) ||
-            (snake.getDirection() == RIGHT && lastPressedArrowKey == LEFT);
+  return (snake.getDirection() == UP && lastPressedArrowKey == DOWN) ||
+         (snake.getDirection() == DOWN && lastPressedArrowKey == UP) ||
+         (snake.getDirection() == LEFT && lastPressedArrowKey == RIGHT) ||
+         (snake.getDirection() == RIGHT && lastPressedArrowKey == LEFT);
 }
 
+
 /**
-  @function elementOutOfBounds(element) -> boolean
-  @desc Geef aan of het element buiten het canvas valt
-  @param {Element} element een Element object
-  @return {boolean} false bij:
+  @function elementOutOfBounds
+  @desc   Geef aan of het element buiten het canvas valt
+  @param  {Object} element - Het te toetsen element
+  @return {boolean} true bij:
                        - element van buiten het canvas
-                    anders true
+                    anders false
 */
 function elementOutOfBounds(element) {
-    return element.x < XMIN || element.x > xMax ||
-            element.y < YMIN || element.y > yMax;
+  return element.x < XMIN || element.x > xMax ||
+         element.y < YMIN || element.y > yMax;
 }
 
 
 /**
-  @function refitNewHeadToCanvas(element) -> void
+  @function refitNewHeadToCanvas
   @desc Pas de x of y coordinaat van het nieuwe hoofd aan
         zodat deze weer binnen het canvas valt
-  @param {Element} element een Element object
+  @param {Object} element - Het te wijzigen element
 */
 function refitNewHeadToCanvas(element) {
-    switch (snake.getDirection()) {
-        case UP:
-            element.y = yMax;
-            break;
-        case DOWN:
-            element.y = YMIN;
-            break;
-        case LEFT:
-            element.x = xMax;
-            break;
-        case RIGHT:
-            element.x = XMIN;
-            break;
-    }
+  switch (snake.getDirection()) {
+    case UP:
+      element.y = yMax;
+      break;
+    case DOWN:
+      element.y = YMIN;
+      break;
+    case LEFT:
+      element.x = xMax;
+      break;
+    case RIGHT:
+      element.x = XMIN;
+      break;
+  }
 }
+
+
 /**
-  @function updateSnakeCoordinaten(newHead, foodCollision) -> void
-  @desc Past coordinaten van de slang en reageer indien deze
-        met voedsel botst
-  @param {Element} newHead de nieuwe head van de slang
+  @function moveSnakeAndEatFood
+  @desc  Past coordinaten van de slang en reageer indien deze
+         met voedsel botst
+  @param {Object} newHead - Het nieuwe hoofd van de slang
   @param {boolean} foodCollision false bij botsing nieuwe head met voedsel
                                  anders true
 */
-function updateSnakeCoordinaten(newHead, foodCollision) {
-    snake.segments.at(-1).color = SNAKE;
-    snake.segments.push(newHead);
-    if(!foodCollision) {
-        snake.segments.shift();
-    } else {
-        removeFood(newHead.x, newHead.y);
-		//Aanvulling Laurens
-		changeScore();
-    }
+function moveSnakeAndEatFood(newHead, foodCollision) {
+  snake.segments.at(-1).color = SNAKE;
+  snake.segments.push(newHead);
+
+  //indien geen botsing met voedsel wordt laatste element van de staart verwijderd
+  if(!foodCollision) {
+    snake.segments.shift();
+
+    //indien botsing voedsel wordt voedsel verwijderd en score aangepast
+  } else {
+    removeFood(newHead.x, newHead.y);
+    changeScore();
+  }
 }
 
 
 /**
-  @function removeFood(x, y) -> void
-  @desc Verwijder voedsel indien deze op een gegeven x en y coordinaat ligt
-  @param {number} x x-coordinaat
-  @param {number} y y-coordinaat
+  @function removeFood
+  @desc  Verwijder voedsel op een gegeven x en y coordinaat
+  @param {number} x - Het x-coordinaat
+  @param {number} y - Het y-coordinaat
 */
 function removeFood(x, y) {
-    //ga alle elementen af in de array foods 
-    for(var i = 0; i < foods.length; i++){
+  //ga alle elementen af in de array foods 
+  for(var i = 0; i < foods.length; i++){
 
-        //verwijder voedsel dat op de meegegeven coordinaten staat
-        if (foods[i].x == x && foods[i].y == y) { 
-            foods.splice(i, 1); 
-        } 
+    //verwijder voedsel dat op de meegegeven coordinaten staat
+    if (foods[i].x == x && foods[i].y == y) { 
+      foods.splice(i, 1); 
     } 
-} 
-
-
-
-/**
-  @function verloren() -> void
-  @desc Stop het spel en geef aan de gebruiker aan dat deze verloren is
-
-function verloren() {
-    stop();
-    drawVerloren();
+  } 
 }
-
-*/ 
  
 /***************************************************************************
  **                  MODULE SNAKEGAME                                      **
@@ -803,436 +790,432 @@ function verloren() {
 
 
 
- 
 /***************************************************************************
- **                  MODULE CONTROLLER                                      **
+ **                  MODULE CANVASCONTROLLER                               **
  ***************************************************************************/
-/**
-import * as settings from "./js";
-import {setMaxCoordinates} from "./js";
-import {initSnakeGame,stopSnakeGame, move, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
-import {place} from "./snakeGame.js";    
-	
-//Aanvullling Laurens	
-import {resetScore} from "./score.js";	
-import {resetNameWinner} from "./winnaar.js";
-
-
-import {enterWinnerNameTimer} from "./controllerDeux.js";	
-import {resetScoreField} from "./controllerDeux.js";	
-import {removeNameInputFields} from "./controllerDeux.js";	
-import {gewonnen} from "./controllerDeux.js";	
-import {initEntriesScoreBoard} from "./controllerDeux.js";	
-*/
 
 var width,                             // breedte van het tekenveld
     height,                            // hoogte van het tekenveld
-
-    snaketimer,
-
+    snaketimer,                        // timer die snakegame controleert
     lastPressedArrowKey = UP; // string van de laatst gedrukte arrow key
 
 
+//eventlisteners voor het indrukken van de arrowkeys
 $(document).keydown(function (e) {
-    switch (e.code) {
+  switch (e.code) {
     case "ArrowLeft":
-       lastPressedArrowKey = LEFT;
-       break;
+      lastPressedArrowKey = LEFT;
+      break;
     case "ArrowUp":
-       lastPressedArrowKey = UP;
-       break;
+      lastPressedArrowKey = UP;
+      break;
     case "ArrowRight":
-       lastPressedArrowKey = RIGHT;
-       break;
+      lastPressedArrowKey = RIGHT;
+      break;
     case "ArrowDown":
-       lastPressedArrowKey = DOWN;
-       break;
-    }
+      lastPressedArrowKey = DOWN;
+      break;
+  }
 });
 
+
+//uit te voeren acties wanneer de webpagina volledig is geladen
 $(document).ready(function () {
-    getDimensionsCanvas();
-    setMaxCoordinates(width, height);
-    $("#stopSnake").click(stop);
-    $("#startSnake").click(start);
+  getDimensionsCanvas();
+  setMaxCoordinates(width, height);
+  $("#stopSnake").click(stop);
+  $("#startSnake").click(start);
 });
+
 
 /**
-  @function getDimensionsCanvas() -> void
+  @function getDimensionsCanvas
   @desc Haal de hoogte en wijdte van het canvas op via het DOM-object
         en sla deze op in variabelen
 */
 function getDimensionsCanvas() {
-    width = $("#mySnakeCanvas").innerWidth();
-    height = $("#mySnakeCanvas").innerHeight();
+  width = $("#mySnakeCanvas").innerWidth();
+  height = $("#mySnakeCanvas").innerHeight();
 }
 
-function stop() {
-    $("#mySnakeCanvas").clearCanvas();
-    clearInterval(snaketimer);
-    stopSnakeGame(); 
-}
-
-function start() {
-    initSnakeGame();
-    
-		//Aanvulling Laurens
-		resetScore();
-		resetScoreField();
-		removeNameInputFields();
-		resetNameWinner();
-		clearInterval(enterWinnerNameTimer);
-		initEntriesScoreBoard();
-	//Aanvulling Laurens
-	
-	
-	draw();
-    snaketimer = setInterval(function() {
-        updateSnakeGame();}, SLEEPTIME); 
-}
-
-function updateSnakeGame() {
-	move(lastPressedArrowKey);
-	
-	
-	draw();
-	determineResult();
-}
-
-function determineResult(){
-	let status = getGameStatus();
-	switch(status) {
-		case WON:
-			stop();
-			drawGewonnen();
-			gewonnen(place);
-			break;
-		case LOST:
-			stop();
-			drawVerloren();
-			break;
-
-	}
-}
 
 /**
-  @function draw() -> void
+  @function stop
+  @desc Maak het canvas leeg, stop de timer en reset het spel
+*/
+function stop() {
+  $("#mySnakeCanvas").clearCanvas();
+  clearInterval(snaketimer);
+  resetSnakeGame(); 
+}
+
+
+/**
+  @function start
+  @desc Start het spel, initialiseer het scorebord, teken het begin van het spel
+        op het canavs en start de timer van het spel
+*/
+function start() {
+  initSnakeGame();
+  resetScoreAndAdjustScoreboard();
+  draw();
+  snaketimer = setInterval(function() {
+    updateGameAndViewer();}, SLEEPTIME); 
+}
+
+
+/**
+  @function updateGameAndViewer
+  @desc Beweeg de slang volgens de timer en handel elke soort collision af,
+        teken de nieuwe status van het spel, bepaal winst of verlies en
+        pas de score aan
+*/
+function updateGameAndViewer() {
+  moveSnakeAndResolveCollisions(lastPressedArrowKey);
+  draw();
+  determineResult();
+  setScoreField();
+}
+
+
+/**
+  @function determineResult
+  @desc Bepaal de uitkomst van het spel bij winst of verlies en pas 
+        de viewer hierop aan, doe niks indien geen winst of verlies
+*/
+function determineResult(){
+  let status = getGameStatus();
+  switch(status) {
+    case WON:
+      stop();
+      drawGewonnen();
+      gewonnen(place);
+      lastPressedArrowKey = UP;
+      break;
+    case LOST:
+      stop();
+      drawVerloren();
+      lastPressedArrowKey = UP;
+      break;
+  }
+}
+
+
+/**
+  @function draw
   @desc Teken de slang en het voedsel op het canvas
 */
 function draw() {
-    var canvas = $("#mySnakeCanvas").clearCanvas();
-    drawElements(getSnakeSegments(), canvas);
-    drawElements(getFoods(), canvas);
+  var canvas = $("#mySnakeCanvas").clearCanvas();
+  drawElements(getSnakeSegments(), canvas);
+  drawElements(getFoods(), canvas);
 }
 
+
 /**
-  @function drawElements(elements, canvas) -> void
-  @desc Elementen tekenen
-  @param [Element] array van elementen
-  @param {dom object} canvas het tekenveld
+  @function drawElements
+  @desc  Teken meerdere elementen op het canvas
+  @param {array} elements - Een array van te tekenen elementen
+  @param {object} canvas - Het tekenveld
  */
 function drawElements(elements, canvas) {
-    elements.forEach(function (element) {
-        drawElement(element, canvas);
-    });
+  elements.forEach(function (element) {
+    drawElement(element, canvas);
+  });
 }
 
+
 /**
-  @function drawElement(element, canvas) -> void
-  @desc Een element tekenen 
-  @param {Element} element een Element object
-  @param  {dom object} canvas het tekenveld
+  @function drawElement
+  @desc   Teken een element
+  @param  {object} element - Het te tekenen element
+  @param  {object} canvas - Het tekenveld
 */
  function drawElement(element, canvas) {
-    canvas.drawArc({
-        draggable : false,
-        fillStyle : element.color,
-        x : element.x,
-        y : element.y,
-        radius : element.radius
-    });
+  canvas.drawArc({
+    draggable : false,
+    fillStyle : element.color,
+    x : element.x,
+    y : element.y,
+    radius : element.radius
+  });
 }
 
+
 /**
-  @function drawVerloren -> void
-  @desc Teken een afbeelding op het canvas dat duidelijk aangeeft dat gebruiker is verloren
+  @function drawVerloren
+  @desc Teken een afbeelding op het canvas dat aangeeft dat gebruiker is verloren
 */
 function drawVerloren() {
-    $("#mySnakeCanvas").drawImage({
-    source: 'sad_snake.jpg',
+  $("#mySnakeCanvas").drawImage({
+    source: 'img/sad_snake.jpg',
     x: 210, y: 240,
     scale : 0.5
-    });
+  });
 }
 
 
+/**
+  @function drawGewonnen
+  @desc Teken een afbeelding op het canvas dat aangeeft dat gebruiker is gewonnen
+*/
 function drawGewonnen() {
-	$("#mySnakeCanvas").drawImage({
-	source: 'newHighScore.jpg',
-	x: 230, y: 190,
-	scale : 1
-	});
+  $("#mySnakeCanvas").drawImage({
+    source: 'img/newHighScore.jpg',
+    x: 230, y: 190,
+    scale : 1
+  });
 }
 
 
-
-
 /***************************************************************************
- **                   MODULE CONTROLLER                                       **
+ **                   MODULE CANVASCONTROLLER                              **
  ***************************************************************************/
 
 
 
 
 /***************************************************************************
- **                 MODULE CONTROLLERDEUX                                          **
+ **                 MODULE SCOREBOARDCONTROLLER                            **
  ***************************************************************************/
-/**
-import * as settings from "./js";
 
-import * as winnaar from "./winnaar.js";
-import * as score from "./score.js";
-
-
-import {addScoreBoardEntries}  from "./EntriesScoreboard.js";
-import {getEntriesScoreBoard}  from "./EntriesScoreboard.js";
-import {adjustEntriesScoreboard}  from "./EntriesScoreboard.js";
-
-
-//import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
-
-import {getEntriesLocalStorage}  from "./LocalStorage.js";
-import {addEntriesToLocalStorage}  from "./LocalStorage.js";
-*/
-
-
-/**export*/ var enterWinnerNameTimer;
-
-///**export*/ var place;
+var enterWinnerNameTimer;           // timer die de input van de naam van de winnaar controleert
 
 
 /**
-  @function setScoreField() -> void
-  @desc vul het veld score met de score in het spel
+  @function setScoreField
+  @desc Vul het scoreveld in met de score van het spel
 */
-/**export*/ function setScoreField() {
-	let scored = getScore();
-	$(".scorefield4").text(scored);
+function setScoreField() {
+  let scored = getScore();
+  $(".scorefield4").text(scored);
 } 
 
+
 /**
-  @function getScoreField() -> void
-  @desc vul het veld score met de score in het spel
+  @function getScoreField
+  @desc   Haal de huidig afgebeelde score op van het scoreveld
+  @return {string} De score ingevuld in het scoreveld
 */
 function getScoreField() { 
-	return $(".scorefield4").text();
+  return $(".scorefield4").text();
 }
 
 
 /**
-  @function resetScoreField() -> void
-  @desc zet de waarde van het scoreveld naar 0
+  @function resetScoreAndAdjustScoreboard
+  @desc Reset de score van het spel, de score op het scoreveld en de 
+        naam van de winnaar, verwijder het inputveld uit de viewer en
+        initialiseer het scorebord met de nieuwe highscores
 */
-/**export*/ function resetScoreField() { 
-	$(".scorefield4").text(0);
+function resetScoreAndAdjustScoreboard() {$
+  resetScore();
+  resetScoreField();
+  removeNameInputFields();
+  resetNameWinner();
+  clearInterval(enterWinnerNameTimer);
+  initEntriesScoreBoard();
 }
 
 
 /**
-  @function determineResultGame() -> void
-  @desc bepaal of de eindscore een high score is en de winnaar dus heeft gewonnen
-
-function determineResultGame() { 
-	//let result = getScore();
-	place = scoreIsNewHigh();
-	if(!place.includes("noHighscore")) { 
-		setGameStatus(WON); 
-	} else {setGameStatus(LOST);}
- } 
+  @function resetScoreField
+  @desc Zet de waarde van het scoreveld naar 0
 */
+function resetScoreField() { 
+  $(".scorefield4").text(0);
+}
 
 
-/**export*/ function gewonnen(place) {
-	createNameInputFields();
-	enterWinnerNameTimer = setInterval(function() {
+/**
+  @function  removeNameInputFields
+  @desc Verwijder het label, het inputveld en de knop waar de winnaar
+        zijn/haar naam kan invoeren
+*/
+function removeNameInputFields() { 
+  let labelCollection = document.getElementsByTagName("label");
+  let labe1One = labelCollection[10];
+  let labe1Two = labelCollection[11];
+  if(labe1One !== undefined && labe1Two !== undefined ) { 
+    labe1One.remove();
+    labe1Two.remove();
+  } 
+  let buttonCollection = document.getElementsByTagName("button");
+  let button = buttonCollection[0];
+  if(button !== undefined) { 
+    button.remove();
+  } 
+  let nameFieldCollection = document.getElementsByTagName("INPUT");
+  let nameField = nameFieldCollection[2];
+  if(nameField !== undefined) { 
+    nameField.remove();
+  } 
+}
+
+
+/**
+  @function  setEntriesScoreBoard
+  @desc Voeg de in de local storage aanwezige entries (met plek, score en naam winnaar)toe 
+        aan het scorebord en aan de applicatie
+*/
+function initEntriesScoreBoard() { 
+  let entriesForScoreboard = getEntriesLocalStorage();
+  addScoreBoardEntries(entriesForScoreboard); 
+  assignScoreBoardToFields();
+}
+
+
+/**
+  @function assignScoreBoardToFields
+  @desc Zet de entries van het scorebord in het scorebord van de applicatie. 
+*/  
+function assignScoreBoardToFields() { 
+  let entries = getEntriesScoreBoard();
+  entries.forEach((entryScore, key) => { ; 
+    switch (key) {
+    case "placeOne": 
+    $(".namefield1").text(entryScore.name);
+    $(".scorefield1").text(entryScore.score);
+    break;
+    case "placeTwo": 
+    $(".namefield2").text(entryScore.name);
+    $(".scorefield2").text(entryScore.score);
+    break;
+    case "placeThree": 
+    $(".namefield3").text(entryScore.name);
+    $(".scorefield3").text(entryScore.score);
+    break;
+    } 
+  }); 
+} 
+
+
+/**
+  @function gewonnen
+  @desc Maak een inputveld aan waar de winnaar zijn naam kan schrijven en 
+        detecteer deze input aan de hand van een timer
+  @param {string} place - De plaats van de nieuwe winnaar
+*/
+function gewonnen(place) {
+  createNameInputFields();
+  enterWinnerNameTimer = setInterval(function() {
     procesScoreOfWinner(place);}, WAITFORNAMEWINNER);
 }
 
 
-
 /**
-  @function  assignScoreBoardToFields() -> void()
-  @desc zet de entries van het scorebord in het scorebord van de applicatie. 
-*/	
-function assignScoreBoardToFields() { 
-	let entries = getEntriesScoreBoard();
-	console.log(entries);
-	entries.forEach((entryScore, key) => { ; 
-		switch (key) {
-		case "placeOne": 
-		$(".namefield1").text(entryScore.name);
-		$(".scorefield1").text(entryScore.score);
-		break;
-		case "placeTwo": 
-		$(".namefield2").text(entryScore.name);
-		$(".scorefield2").text(entryScore.score);
-		break;
-		case "placeThree": 
-		$(".namefield3").text(entryScore.name);
-		$(".scorefield3").text(entryScore.score);
-		break;
-		} 
-	}); 
-} 
-
-
-
-/**
-  @function  createNameInputFields() -> void()
-  @desc creeer het inputveld, de button en de eventlisteren zodat
-  de winnaar de naam kan invoeren. 
+  @function createNameInputFields
+  @desc Creëer het inputveld, de button en de eventlistener zodat
+        de winnaar zijn/haar naam kan invoeren. 
 */
 function createNameInputFields() { 
-		createWhiteSpaces();
-		createEnterNameButton();
-		createEnterNameField();
-		createEventlisterer();
+    createWhiteSpaces();
+    createEnterNameButton();
+    createEnterNameField();
+    createEventlisterer();
 } 
 
 
 /**
-  @function  createWhiteSpaces() -> void()
-  @desc creeer een witte ruimte 
+  @function createWhiteSpaces
+  @desc Creëer een witte ruimte 
 */
 function createWhiteSpaces() { 
-	let labe1One = document.createElement("label");
-	let labe1Two = document.createElement("label");
-	$(".scoreboard").append(labe1One);
-	$(".scoreboard").append(labe1Two);
+  let labe1One = document.createElement("label");
+  let labe1Two = document.createElement("label");
+  $(".scoreboard").append(labe1One);
+  $(".scoreboard").append(labe1Two);
 } 
 
 
 /**
-  @function  createEnterNameButton() -> void()
-  @desc creeer button zodat de winnaar zijn/haar naam kan valideren
+  @function createEnterNameButton
+  @desc Creëer button zodat de winnaar zijn/haar naam kan valideren
 */
 function createEnterNameButton() { 
-	let button = document.createElement("button");
-	button.innerHTML = "Enter name";
-	$(".scoreboard").append(button);	
-	
+  let button = document.createElement("button");
+  button.innerHTML = "Enter name";
+  $(".scoreboard").append(button);  
 } 
 
+
 /**
-  @function  createEnterNameField() -> void()
-  @desc creeer input veld zodat de winnaar zijn/haar naam kan invoeren
+  @function createEnterNameField
+  @desc Creëer input veld zodat de winnaar zijn/haar naam kan invoeren
 */
 function createEnterNameField() { 
-	let nameField = document.createElement("INPUT");
-	nameField.setAttribute("type", "text");
-	$(".scoreboard").append(nameField);
+  let nameField = document.createElement("INPUT");
+  nameField.setAttribute("type", "text");
+  $(".scoreboard").append(nameField);
 } 
 
 
 /**
-  @function  createEventlisterer() -> void()
-  @desc eventlistener geeft de naam in het inputveld waar de winnaar zijn/haar naam
-  heeft ingevuld
+  @function  createEventlisterer
+  @desc Eventlistener voor de knop naast het inputveld die de naam van de 
+        winnaar opslaat
 */
 function createEventlisterer() { 
-	let buttonCollection = document.getElementsByTagName("button");
-	let nameFieldCollection = document.getElementsByTagName("INPUT");
-	let button = buttonCollection[0];
-	let nameField = nameFieldCollection[2]
-	buttonCollection[0].addEventListener("click", function() {
-		let nameWinner = nameFieldCollection[2].value.substring(0, 13);
-		setNameWinner(nameWinner);
-	});
+  let buttonCollection = document.getElementsByTagName("button");
+  let nameFieldCollection = document.getElementsByTagName("INPUT");
+  let button = buttonCollection[0];
+  let nameField = nameFieldCollection[2]
+  buttonCollection[0].addEventListener("click", function() {
+    let nameWinner = nameFieldCollection[2].value.substring(0, 13);
+    setNameWinner(nameWinner);
+  });
 } 
 
+
 /**
-  @function procesScoreOfWinner() -> void()
-  @desc eventlistener geeft de naam in het inputveld waar de winnaar zijn/haar naam
-  heeft ingevuld
+  @function procesScoreOfWinner
+  @desc  Bepaal de plaats, score en naam van de winnaar en pas hiermee het 
+         scorebord en de entries in de local storage aan. Verwijder het
+         inputveld en stop de timer voor de naam in te vullen
+  @param {string} newplace - De plaats die de winnaar moet krijgen in het scorebord
 */
 function procesScoreOfWinner(newplace) { 
-	let newPlace = newplace;
-	let scored = getScore();
-	let nameWinner = getNameWinner();
-	if (nameWinner !== undefined) { 
-		changeScoreboard(newPlace, nameWinner, scored);
-		addEntriesScoreboardToLocalStorage();
-		removeNameInputFields();
-		clearInterval(enterWinnerNameTimer);
-	} 	
+  let newPlace = newplace;
+  let scored = getScore();
+  let nameWinner = getNameWinner();
+  if (nameWinner !== undefined) { 
+    changeScoreboard(newPlace, nameWinner, scored);
+    addEntriesScoreboardToLocalStorage();
+    removeNameInputFields();
+    clearInterval(enterWinnerNameTimer);
+  }   
 } 
 
 
 /**
-  @function  changeScoreboard(newPlace, name) -> void()
-  @desc pas de entries van het scorebord aan in het domein en pas
-  pas de waarden in het scorebord aan in de applicatie, indien er een nieuwe 
-  high score is. 
+  @function changeScoreboard
+  @desc Pas de entries van het scorebord aan in het domein en pas de waarden 
+        in het scorebord aan in de applicatie indien er een nieuwe high score is.
+  @param {string} newplace - De plaats die de winnaar moet krijgen in het scorebord
+  @param {string} name - De naam van de winnaar
+  @param {number} score - De score die de winnaar heeft behaald
  */
 function changeScoreboard(newplace, name, score) {
-	let newPlace = newplace;
-	let nameWinner = name;
-	let scored = score;
-	console.log("result: " + newPlace + nameWinner + scored);
-	adjustEntriesScoreboard(newPlace, nameWinner, scored);
-	assignScoreBoardToFields();
+  let newPlace = newplace;
+  let nameWinner = name;
+  let scored = score;
+  adjustEntriesScoreboard(newPlace, nameWinner, scored);
+  assignScoreBoardToFields();
 }
 
 
 /**
-  @function  removeNameInputFields() -> void()
-  @desc creeer het inputveld, de button en de eventlisteren zodat
-  de winnaar de naam kan invoeren. 
-*/
-/**export*/ function removeNameInputFields() { 
-	let labelCollection = document.getElementsByTagName("label");
-	let labe1One = labelCollection[10];
-	let labe1Two = labelCollection[11];
-	if(labe1One !== undefined && labe1Two !== undefined ) { 
-		labe1One.remove();
-		labe1Two.remove();
-	} 
-	let buttonCollection = document.getElementsByTagName("button");
-	let button = buttonCollection[0];
-	if(button !== undefined) { 
-		button.remove();
-	} 
-	let nameFieldCollection = document.getElementsByTagName("INPUT");
-	let nameField = nameFieldCollection[2];
-	if(nameField !== undefined) { 
-		nameField.remove();
-	} 
-} 
-
-
-/**
-  @function  setEntriesScoreBoard() -> void()
-  @desc voeg in de local storage aanwezige entries (met plek, score en naam winnaar)toe aan het scorebord 
-  en aan de applicatie
-*/
-/**export*/ function initEntriesScoreBoard() { 
-	let entriesForScoreboard = getEntriesLocalStorage();
-	addScoreBoardEntries(entriesForScoreboard); 
-	assignScoreBoardToFields();
-} 
-
-/**
-  @function  addEntriesToLocalStorage() -> void()
-  @desc voeg in de entries van het scorebord in de local storage van de browser 
+  @function  addEntriesToLocalStorage
+  @desc Voeg de entries van het scorebord toe aan de local storage 
  */
 function addEntriesScoreboardToLocalStorage() { 
-	let entriesScoreboard = getEntriesScoreBoard();
-	addEntriesToLocalStorage(entriesScoreboard);
-} 
+  let entriesScoreboard = getEntriesScoreBoard();
+  addEntriesToLocalStorage(entriesScoreboard);
+}  
 
 
 /***************************************************************************
- **                 MODULE CONTROLLERDEUX                                    **
+ **                 MODULE SCOREBOARDCONTROLLER                            **
  ***************************************************************************/
 
 
@@ -1242,108 +1225,91 @@ function addEntriesScoreboardToLocalStorage() {
  **                MODULE LOCALSTORAGE                                **
  ***************************************************************************/
 
-
-//localStorage.clear();
-
 /**
-entry1 = JSON.stringify(new EntryScore("SnakeKiller030", 40, true));
-entry2 = JSON.stringify(new EntryScore("Joop", 60, true));
-entry3 = JSON.stringify(new EntryScore("Aagje", 200, true));
-entry3 = JSON.stringify(new EntryScore("Aagj", 30, true));
-localStorage.setItem("placeOne",entry2);
-localStorage.setItem("placeTwo",entry1);
-//localStorage.setItem("placeThree",entry3);
-localStorage.setItem("hey",entry3);
-localStorage.setItem("gek",entry3);
-*/
-
-
-
-/**
-  @function setScoreBoard() -> void
-  @desc haal de aanwezig entries met naam en score uit de local storage van de webbrowser
+  @function setScoreBoard
+  @desc   Haal de keys op uit de local storage, filter enkel de keys die het spel gebruikt en
+          haal hun overeenkomstige values op. Ken deze toe aan een Map object en vul indien nodig
+          lege plaatsen op
+  @return {map} Een map met de entries van de local storage van de browser
  */
-/**export*/ function getEntriesLocalStorage(){ 
-	let keysLocalStorage = getKeysLocalStorage();
-	let filteredKeysLocalStorage = filterKeysLocalStorage(keysLocalStorage);
-	let localEntries = entriesLocalStorage(filteredKeysLocalStorage);
-	return localEntries;
+function getEntriesLocalStorage(){ 
+  let keysLocalStorage = getKeysLocalStorage();
+  let filteredKeysLocalStorage = filterKeysLocalStorage(keysLocalStorage);
+  let localEntries = entriesLocalStorage(filteredKeysLocalStorage);
+  return localEntries;
 } 
 
 
 /**
-  @function getKeysLocalStorage() -> string[]
-  @desc lees de keys van de local storage van de webbrows in.
-  @return {string[]} keysLocalStorage een array met de keys van de local storage
+  @function getKeysLocalStorage
+  @desc   Lees de keys van de local storage van de webbrowser in
+  @return {array} Een array met de keys van de local storage
   */
 function getKeysLocalStorage() { 
-	let keysLocalStorage = []; 
-	let index = localStorage.length - 1;
-	while(index >= 0) { 
-		let keyName = localStorage.key(index);
-		keysLocalStorage.push(keyName);
-		index--;
-	} 
-	return keysLocalStorage;
+  let keysLocalStorage = []; 
+  let index = localStorage.length - 1;
+  while(index >= 0) { 
+    let keyName = localStorage.key(index);
+    keysLocalStorage.push(keyName);
+    index--;
+  } 
+  return keysLocalStorage;
 } 
 
 
 /**
-  @function filterKeysLocalStorage(keys)-> string[]
-  @desc filter de keys van de local storage op entries: placeThree, placeTwo, placeOne.
-  @param {sring[]} keysLocalStorage een array met keys uit de local storage van de webbrowser
-  @return {sring[]} filteredKeysLocalStorage een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
+  @function filterKeysLocalStorage
+  @desc   Filter de keys van de local storage op entries: placeThree, placeTwo, placeOne
+  @param  {array} keysLocalStorage - Een array met keys uit de local storage van de webbrowser
+  @return {array} Een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
   */
 function filterKeysLocalStorage(keys) { 
-	let filteredKeysLocalStorage = []; 
-	if(keys.length <= 0) { 
-		return keys
-	} 
-	keys.forEach(key => {
-			if(key.includes("placeOne") || key.includes("placeTwo") || key.includes("placeThree")) { 
-				filteredKeysLocalStorage.push(key);
-			}});
-	return filteredKeysLocalStorage;
+  let filteredKeysLocalStorage = []; 
+  if(keys.length <= 0) { 
+    return keys
+  } 
+  keys.forEach(key => {
+      if(key.includes("placeOne") || key.includes("placeTwo") || key.includes("placeThree")) { 
+        filteredKeysLocalStorage.push(key);
+      }});
+  return filteredKeysLocalStorage;
 } 
-	
+  
 
 /**
-  @function getEntriesLocalStorage(filteredKeys) -> void
-  @desc haal de entries, met naam en score, uit de local storage van de webbrowser 
-  en vul met de waarden de variabele entriesScoreboard. De entries uit de local storage worden omgezet
-  in een object EntryScore.
-  @param {sring[]} filteredKeysLocalStorage een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
+  @function getEntriesLocalStorage
+  @desc   Haal de entries, met naam en score, uit de local storage van de webbrowser 
+          en vul met de waarden de variabele entriesScoreboard. De entries uit de local storage worden omgezet
+          in een object EntryScore
+  @param  {array} filteredKeysLocalStorage - Een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne
+  @return {map} Een Map object met alle entries die bij de keys horen
   */
 function entriesLocalStorage(filteredKeys) { 
-	let entries = new Map();
-	filteredKeys.forEach(key => { 
-		let entryScore = JSON.parse(localStorage.getItem(key));
-		if (entryScore === null) {  
-			entryScore = new EntryScore();
-		}
-		entries.set(key, entryScore);
-	}); 
-	return entries;
-}	
-	
-
+  let entries = new Map();
+  filteredKeys.forEach(key => { 
+    let entryScore = JSON.parse(localStorage.getItem(key));
+    if (entryScore === null) {  
+      entryScore = new EntryScore();
+    }
+    entries.set(key, entryScore);
+  }); 
+  return entries;
+} 
+  
 
 /**
-  @function addEntriesToLocalStorage() -> void
-  @desc voeg de key/value paren van de map entriesScoreboard toe aan de local storage van de webbrowser,
-  de EntrieScore object worden omgezet naar een string format. 
+  @function addEntriesToLocalStorage
+  @desc  Voeg de key/value paren van de map entriesScoreboard toe aan de local storage van de webbrowser,
+         het entryScore object worden omgezet naar een string format. 
+  @param {map} Een map die alle informatie van de 3 scorebord omvat
   */
-/**export*/ function addEntriesToLocalStorage(scoreboard) {
-	let entries = scoreboard
-	entries.forEach((entry, key) => { 
-		localStorage.setItem(key, JSON.stringify(entry));
-	});
-} 
-
-
+function addEntriesToLocalStorage(scoreboard) {
+  let entries = scoreboard
+  entries.forEach((entry, key) => { 
+    localStorage.setItem(key, JSON.stringify(entry));
+  });
+}
 
 /***************************************************************************
  **                MODULE LOCALSTORAGE                                **
  ***************************************************************************/
-
-

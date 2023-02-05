@@ -671,7 +671,7 @@ QUnit.test( "test getGameStatus",
 		assert.equal(getGameStatus(), INACTIVE, "de functie levert dezelfde waarde op als de begin waarde van de variabele");
 });
 
-QUnit.test( "test stopSnakeGame", 
+QUnit.test( "test resetSnakeGame", 
 	function( assert ) {
 		snake = createStartSnake();
 		foods = createFoods(snake);
@@ -684,7 +684,7 @@ QUnit.test( "test stopSnakeGame",
 		assert.notEqual(gameStatus, INACTIVE, "gamestatus is niet gelijk aan de default waarde");
 
 		//gebruik functie stopSnakeGame
-		stopSnakeGame();
+		resetSnakeGame();
 
 		//test of variabelen terug de default waarde hebben gekregen
 		assert.deepEqual(foods, [], "foods is opnieuw een lege array");
