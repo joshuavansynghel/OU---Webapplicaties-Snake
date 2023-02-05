@@ -13,26 +13,25 @@
       <script src="jcanvas.js"></script>
       <script src="uitgangscode.js" data-cover></script>
       <script src="testuitgangscode.js"></script>
-      <script src="blanket.js"></script>
-      <!-- from section to canvas is needed for testing javascript and can be deleted afterwards -->
+      <!-- Mimick DOM objects for testing purposes -->
       <section>
          <input id="startSnake" type="submit" class="button" value="Start" hidden="hidden"/>
          <input id="stopSnake" type="submit" class="button" value="Stop" hidden="hidden"/>
       </section>
-      <canvas id="mySnakeCanvas" width="460" height="460"></canvas>
+      <canvas id="mySnakeCanvas" width="460" height="460" hidden></canvas>
       <div class="scoreboard">  
-            <div class="scoreboard_name">Name</div> 
-            <div class="scoreboard_score">High Scores</div>
-            <label class="namefield1"></label> 
-            <label class="scorefield1"></label> 
-            <label class="namefield2"></label> 
-            <label class="scorefield2"></label> 
-            <label class="namefield3"></label> 
-            <label class="scorefield3"></label> 
-            <label class="whitespace"></label> 
-            <label class="whitespace"></label> 
-            <label class="score">Score</label> 
-            <label class="scorefield4"></label> 
+            <div class="scoreboard_name" hidden>Name</div> 
+            <div class="scoreboard_score" hidden>High Scores</div>
+            <label class="namefield1" hidden></label> 
+            <label class="scorefield1" hidden></label> 
+            <label class="namefield2" hidden></label> 
+            <label class="scorefield2" hidden></label> 
+            <label class="namefield3" hidden></label> 
+            <label class="scorefield3" hidden></label> 
+            <label class="whitespace" hidden></label> 
+            <label class="whitespace" hidden></label> 
+            <label class="score" hidden>Score</label> 
+            <label class="scorefield4" hidden></label> 
       </div>
    </body>
 </html>
