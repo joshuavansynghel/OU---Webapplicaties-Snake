@@ -6,7 +6,6 @@ import {createStartSnake, createHead} from "./snake.js";
 import {createFoods} from "./food.js";
 import {changeScore, setScore} from "./score.js";
 import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
-import {setScoreField}  from "./controllerDeux.js";
 
 var snake,
     foods = [],                        // voedsel voor de slang

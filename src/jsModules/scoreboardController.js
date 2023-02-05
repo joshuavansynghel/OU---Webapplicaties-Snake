@@ -1,34 +1,30 @@
+/** @module scoreboardController */
+
 import * as settings from "./settings.js";
 
 import * as winnaar from "./winnaar.js";
 import * as score from "./score.js";
-
-import {addScoreBoardEntries}  from "./EntriesScoreboard.js";
-import {getEntriesScoreBoard}  from "./EntriesScoreboard.js";
-import {adjustEntriesScoreboard}  from "./EntriesScoreboard.js";
-
-//import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
-
-import {getEntriesLocalStorage}  from "./LocalStorage.js";
-import {addEntriesToLocalStorage}  from "./LocalStorage.js";
+import {getEntriesLocalStorage, addEntriesToLocalStorage}  from "./LocalStorage.js";
+import {addScoreBoardEntries, getEntriesScoreBoard, adjustEntriesScoreboard}  from "./EntriesScoreboard.js";
 
 
-export var enterWinnerNameTimer;
+export var enterWinnerNameTimer;           //timer die de input van de naam van de winnaar controleert
 
-//export var place;
 
 /**
-  @function setScoreField() -> void
-  @desc vul het veld score met de score in het spel
+  @function setScoreField
+  @desc Vul het scoreveld in met de score van het spel
 */
 export function setScoreField() {
 	let scored = score.getScore();
 	$(".scorefield4").text(scored);
 } 
 
+
 /**
-  @function getScoreField() -> void
-  @desc vul het veld score met de score in het spel
+  @function getScoreField
+  @desc   Haal de huidig afgebeelde score op van het scoreveld
+  @return {string} score - De score ingevuld in het scoreveld
 */
 function getScoreField() { 
 	return $(".scorefield4").text();
@@ -36,14 +32,19 @@ function getScoreField() {
 
 
 /**
-  @function resetScoreField() -> void
-  @desc zet de waarde van het scoreveld naar 0
+  @function resetScoreField
+  @desc Zet de waarde van het scoreveld naar 0
 */
-export function resetScoreField() { 
+function resetScoreField() { 
 	$(".scorefield4").text(0);
 }
 
 
+/**
+  @function gewonnen
+  @desc Maak een inputveld aan waar de winnaar zijn naam kan schrijven en 
+        detecteer deze input aan de hand van een timer
+*/
 export function gewonnen(place) {
 	createNameInputFields();
 	enterWinnerNameTimer = setInterval(function() {
@@ -51,10 +52,25 @@ export function gewonnen(place) {
 }
 
 
+/**
+  @function resetScoreAndAdjustScoreboard
+  @desc Reset de score van het spel, de score op het scoreveld en de 
+        naam van de winnaar, verwijder het inputveld uit de viewer en
+        initialiseer het scorebord met de nieuwe highscores
+*/
+export function resetScoreAndAdjustScoreboard() {$
+  score.resetScore();
+  resetScoreField();
+  removeNameInputFields();
+  winnaar.resetNameWinner();
+  clearInterval(enterWinnerNameTimer);
+  initEntriesScoreBoard();
+}
+
 
 /**
-  @function  assignScoreBoardToFields() -> void()
-  @desc zet de entries van het scorebord in het scorebord van de applicatie. 
+  @function assignScoreBoardToFields
+  @desc Zet de entries van het scorebord in het scorebord van de applicatie. 
 */	
 function assignScoreBoardToFields() { 
 	let entries = getEntriesScoreBoard();
@@ -78,11 +94,10 @@ function assignScoreBoardToFields() {
 } 
 
 
-
 /**
-  @function  createNameInputFields() -> void()
-  @desc creeer het inputveld, de button en de eventlisteren zodat
-  de winnaar de naam kan invoeren. 
+  @function createNameInputFields
+  @desc Creëer het inputveld, de button en de eventlistener zodat
+        de winnaar zijn/haar naam kan invoeren. 
 */
 function createNameInputFields() { 
 		createWhiteSpaces();
@@ -93,8 +108,8 @@ function createNameInputFields() {
 
 
 /**
-  @function  createWhiteSpaces() -> void()
-  @desc creeer een witte ruimte 
+  @function createWhiteSpaces
+  @desc Creëer een witte ruimte 
 */
 function createWhiteSpaces() { 
 	let labe1One = document.createElement("label");
@@ -105,18 +120,18 @@ function createWhiteSpaces() {
 
 
 /**
-  @function  createEnterNameButton() -> void()
-  @desc creeer button zodat de winnaar zijn/haar naam kan valideren
+  @function createEnterNameButton
+  @desc Creëer button zodat de winnaar zijn/haar naam kan valideren
 */
 function createEnterNameButton() { 
 	let button = document.createElement("button");
 	button.innerHTML = "Enter name";
 	$(".scoreboard").append(button);	
-	
 } 
 
+
 /**
-  @function  createEnterNameField() -> void()
+  @function createEnterNameField
   @desc creeer input veld zodat de winnaar zijn/haar naam kan invoeren
 */
 function createEnterNameField() { 
@@ -127,9 +142,9 @@ function createEnterNameField() {
 
 
 /**
-  @function  createEventlisterer() -> void()
-  @desc eventlistener geeft de naam in het inputveld waar de winnaar zijn/haar naam
-  heeft ingevuld
+  @function  createEventlisterer
+  @desc Eventlistener voor de knop naast het inputveld die de naam van de 
+        winnaar opslaat
 */
 function createEventlisterer() { 
 	let buttonCollection = document.getElementsByTagName("button");
@@ -143,9 +158,11 @@ function createEventlisterer() {
 } 
 
 /**
-  @function procesScoreOfWinner() -> void()
-  @desc eventlistener geeft de naam in het inputveld waar de winnaar zijn/haar naam
-  heeft ingevuld
+  @function procesScoreOfWinner
+  @desc  Bepaal de plaats, score en naam van de winnaar en pas hiermee het 
+         scorebord en de entries in de local storage aan. Verwijder het
+         inputveld en stop de timer voor de naam in te vullen
+  @param {string} newplace - De plaats die de winnaar moet krijgen in het scorebord
 */
 function procesScoreOfWinner(newplace) { 
 	let newPlace = newplace;
@@ -161,27 +178,28 @@ function procesScoreOfWinner(newplace) {
 
 
 /**
-  @function  changeScoreboard(newPlace, name) -> void()
-  @desc pas de entries van het scorebord aan in het domein en pas
-  pas de waarden in het scorebord aan in de applicatie, indien er een nieuwe 
-  high score is. 
+  @function changeScoreboard
+  @desc Pas de entries van het scorebord aan in het domein en pas de waarden 
+        in het scorebord aan in de applicatie indien er een nieuwe high score is.
+  @param {string} newplace - De plaats die de winnaar moet krijgen in het scorebord
+  @param {string} name - De naam van de winnaar
+  @param {number} score - De score die de winnaar heeft behaald
  */
 function changeScoreboard(newplace, name, score) {
 	let newPlace = newplace;
 	let nameWinner = name;
 	let scored = score;
-	console.log("result: " + newPlace + nameWinner + scored);
 	adjustEntriesScoreboard(newPlace, nameWinner, scored);
 	assignScoreBoardToFields();
 }
 
 
 /**
-  @function  removeNameInputFields() -> void()
-  @desc creeer het inputveld, de button en de eventlisteren zodat
-  de winnaar de naam kan invoeren. 
+  @function  removeNameInputFields
+  @desc Verwijder het label, het inputveld en de knop waar de winnaar
+        zijn/haar naam kan invoeren
 */
-export function removeNameInputFields() { 
+function removeNameInputFields() { 
 	let labelCollection = document.getElementsByTagName("label");
 	let labe1One = labelCollection[10];
 	let labe1Two = labelCollection[11];
@@ -203,19 +221,20 @@ export function removeNameInputFields() {
 
 
 /**
-  @function  setEntriesScoreBoard() -> void()
-  @desc voeg in de local storage aanwezige entries (met plek, score en naam winnaar)toe aan het scorebord 
-  en aan de applicatie
+  @function  setEntriesScoreBoard
+  @desc Voeg de in de local storage aanwezige entries (met plek, score en naam winnaar)toe 
+        aan het scorebord en aan de applicatie
 */
-export function initEntriesScoreBoard() { 
+function initEntriesScoreBoard() { 
 	let entriesForScoreboard = getEntriesLocalStorage();
 	addScoreBoardEntries(entriesForScoreboard); 
 	assignScoreBoardToFields();
 } 
 
+
 /**
-  @function  addEntriesToLocalStorage() -> void()
-  @desc voeg in de entries van het scorebord in de local storage van de browser 
+  @function  addEntriesToLocalStorage
+  @desc Voeg de entries van het scorebord toe aan de local storage 
  */
 function addEntriesScoreboardToLocalStorage() { 
 	let entriesScoreboard = getEntriesScoreBoard();
