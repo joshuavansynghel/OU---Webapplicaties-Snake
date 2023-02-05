@@ -130,7 +130,6 @@ QUnit.test( "test createFoods",
 		for (counter = 0; counter < NUMFOODS - 1; counter++) {
 			var food = foods.pop();
 			if (elementOutOfBounds(food)) {
-				console.log("foodx: " + food.x + " and foody: " + food.y);
 				foodOutOfBounds = true;
 			}
 		}
@@ -379,10 +378,10 @@ QUnit.test( "test resetNameWinner ",
 });
 
 /***************************************************************************
- **                 MODULE SCOREBOARDENTRIES                              **
+ **                 MODULE ENTRIESSCOREBOARD                              **
  ***************************************************************************/
 
-QUnit.module( "test module scoreboardentries" );
+QUnit.module( "test module entriesScoreboard" );
 
 QUnit.test( "test contstructor EntryScore ",
 	function ( assert ) {
@@ -691,31 +690,6 @@ QUnit.test( "test resetSnakeGame",
 		assert.equal(gameStatus, INACTIVE, "gamestatus is opnieuw naar de constante INACTIVE gezet");
 });
 
-/**
-QUnit.test( "test initSnakeGame", 
-	function( assert ) {
-
-		stopSnakeGame();
-		assert.expect(4);
-
-		//verander gamestatus naar ACTIVE en pas functie toe
-		gameStatus = ACTIVE;
-		initSnakeGame();
-
-		console.log("snake: " + JSON.stringify(snake) + " and foods: " + JSON.stringify(foods));
-		//test of variabelen nog steeds leeg zijn
-		assert.equal(snake, undefined, "snake mag nog steeds geen beginwaarde hebben gekregen");
-		assert.deepEqual(foods, [], "foods moet nog steeds een lege array zijn");
-
-		//verander gamestatus naar INACTIVE en pas functie toe
-		gameStatus = INACTIVE;
-		initSnakeGame();
-
-		//test of variabelen een waarde hebben gekregen
-		assert.notEqual(snake, undefined, "snake mag nog steeds geen beginwaarde hebben gekregen");
-		assert.notDeepEqual(foods, [], "foods moet nog steeds een lege array zijn");
-});
-**/
 
 QUnit.test( "test determineDirection met niet tegengestelde richtingen",
 	function( assert ) {
@@ -1015,25 +989,11 @@ QUnit.test( "test removeFood",
 	function( assert ) {
 		foods = [createFood(50, 70),createFood(20, 30),createFood(100, 20)];
 
-		/**
-		function removedFoodInFoods(coordinatex, coordinatey) {
-		foods.some(function(f) {
-			console.log("coordinatex: " + coordinatex + " and coordinatey: " + coordinatey);
-			console.log("fx: " + f.x + " and fy: " + f.y);
-			console.log(coordinatex == f.x && coordinatey == f.y);
-			return coordinatex == f.x && coordinatey == f.y;
-		})};
-
-		console.log("contains 20 30: " + removedFoodInFoods(20, 30));	
-
-		*/
 		function containsRemovedFood(x, y) {
 			foods.some(function(f) {
-				console.log("fx: " + f.x + " and fy: " + f.y);
 				return x == f.x && y == f.y;
 			});
 		}
-		console.log(containsRemovedFood(20, 30));
 
 		removedFoodInFoods = foods.some(function(f) {
 			return f.x == 20 && f.y == 30;
@@ -1246,10 +1206,10 @@ QUnit.test( "test getEntriesLocalStorage()",
 
 
 /***************************************************************************
- **                 MODULE CONTROLLER                                 **
+ **                 MODULE CANVASCONTROLLER                                 **
  ***************************************************************************/
 
-QUnit.module( "test module controller" );
+QUnit.module( "test module canvasController" );
 
 QUnit.test( "test getDimensionsCanvas", 
 	function( assert ) {
@@ -1268,87 +1228,11 @@ QUnit.test( "test getDimensionsCanvas",
 })
 
 
-
-
-
-/**
-
-QUnit.test( "test drawElement revised", 
-	function( assert ) {
-		var canv = $("#mySnakeCanvas");
-
-
-		var drawnImage = canv.getCanvasImage(".jpg");
-
-		console.log("DrawnImage: " + drawnImage);
-
-		drawVerloren();
-
-		var drawnImage = canv.getCanvasImage(".jpg");
-
-		console.log("DrawnImage: " + drawnImage);
-
-	});
-
-
-QUnit.test( "test drawElement revised", 
-	function(assert) {
-		var canv = $("#mySnakeCanvas");
-		console.log("canvas: " + JSON.stringify(canv));
-		var food = createFood(40, 70);
-		assert.expect(3);
-
-		drawElement(food, canv);
-
-		//foodObject = canv.getObjects().length;
-
-
-		console.log("canvas: " + canv);
-		console.log("number of objects on canvas: " + canv.getObjects().length);
-		//assert.equal(canv.getObjects().length, 0, "bij initialisatie canvas mag er nog geen element op staan");
-});
-
-
-
-QUnit.test( "test drawElement", 
-	function(assert) {
-		var canv = document.createElement("canvas");
-		console.log("canvas: " + JSON.stringify(canv));
-		canv.innerWidth = 460;
-		canv.innerHeight = 460;
-		var food = createFood(40, 70);
-		assert.expect(3);
-		console.log("number of objects on canvas: " + canv.getObjects().length);
-		//assert.equal(canv.getObjects().length, 0, "bij initialisatie canvas mag er nog geen element op staan");
-
-});
-
-
-
-**/
-
-/**
-QUnit.test( "test getDimensionsCanvas", 
-	function( assert ) {
-		var width, height;
-		getDimensionsCanvas();
-		assert.expect(2);
-		assert.equal(width, 400, "wijdte moet 400 zijn");
-		assert.equal(height, 400, "hoogte moet 400 zijn");
-	});
-
-
-QUnit.test( "drawVerloren
-QUnit.test( "verloren
-QUnit.test( "updateSnakeCoordinaten ")
-
-*/
-
 /***************************************************************************
- **                 MODULE CONTROLLER DEUX                                 **
+ **                 MODULE SCOREBOARDCONTROLLER                                **
  ***************************************************************************/
 
-QUnit.module( "test module controllerdeux" );
+QUnit.module( "test module scoreboardController" );
 
 QUnit.test( "test getScoreField", 
 	function( assert ) {
@@ -1397,16 +1281,3 @@ QUnit.test( "test resetScoreField",
 		labelText = getScoreField();
 		assert.equal(labelText, 0, "na de reset moet de score 0 zijn");
 });
-
-/**
-QUnit.test( "test determineResultGame",
-	function( assert ) {
-		//Maak nieuwe local storeage en vul deze met scores
-		entriesLocalStorageTest = new Map();
-		entriesLocalStorageTest.set("placeThree", new EntryScore("Alice", 20));
-		entriesLocalStorageTest.set("placeTwo", new EntryScore("Jan", 40));
-		entriesLocalStorageTest.set("placeOne", new EntryScore("Truus", 50));
-
-
-	});
-**/
