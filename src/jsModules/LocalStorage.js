@@ -1,23 +1,11 @@
-
-//localStorage.clear();
-
-/**
-entry1 = JSON.stringify(new EntryScore("SnakeKiller030", 40, true));
-entry2 = JSON.stringify(new EntryScore("Joop", 60, true));
-entry3 = JSON.stringify(new EntryScore("Aagje", 200, true));
-entry3 = JSON.stringify(new EntryScore("Aagj", 30, true));
-localStorage.setItem("placeOne",entry2);
-localStorage.setItem("placeTwo",entry1);
-//localStorage.setItem("placeThree",entry3);
-localStorage.setItem("hey",entry3);
-localStorage.setItem("gek",entry3);
-*/
-
-
+/** @module localStorage */
 
 /**
-  @function setScoreBoard() -> void
-  @desc haal de aanwezig entries met naam en score uit de local storage van de webbrowser
+  @function setScoreBoard
+  @desc   Haal de keys op uit de local storage, filter enkel de keys die het spel gebruikt en
+          haal hun overeenkomstige values op. Ken deze toe aan een Map object en vul indien nodig
+          lege plaatsen op
+  @return {map} Een map met de entries van de local storage van de browser
  */
 export function getEntriesLocalStorage(){ 
 	let keysLocalStorage = getKeysLocalStorage();
@@ -28,9 +16,9 @@ export function getEntriesLocalStorage(){
 
 
 /**
-  @function getKeysLocalStorage() -> string[]
-  @desc lees de keys van de local storage van de webbrows in.
-  @return {string[]} keysLocalStorage een array met de keys van de local storage
+  @function getKeysLocalStorage
+  @desc   Lees de keys van de local storage van de webbrowser in
+  @return {array} Een array met de keys van de local storage
   */
 function getKeysLocalStorage() { 
 	let keysLocalStorage = []; 
@@ -45,10 +33,10 @@ function getKeysLocalStorage() {
 
 
 /**
-  @function filterKeysLocalStorage(keys)-> string[]
-  @desc filter de keys van de local storage op entries: placeThree, placeTwo, placeOne.
-  @param {sring[]} keysLocalStorage een array met keys uit de local storage van de webbrowser
-  @return {sring[]} filteredKeysLocalStorage een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
+  @function filterKeysLocalStorage
+  @desc   Filter de keys van de local storage op entries: placeThree, placeTwo, placeOne
+  @param  {array} keysLocalStorage - Een array met keys uit de local storage van de webbrowser
+  @return {array} Een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
   */
 function filterKeysLocalStorage(keys) { 
 	let filteredKeysLocalStorage = []; 
@@ -64,11 +52,12 @@ function filterKeysLocalStorage(keys) {
 	
 
 /**
-  @function getEntriesLocalStorage(filteredKeys) -> void
-  @desc haal de entries, met naam en score, uit de local storage van de webbrowser 
-  en vul met de waarden de variabele entriesScoreboard. De entries uit de local storage worden omgezet
-  in een object EntryScore.
-  @param {sring[]} filteredKeysLocalStorage een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne 
+  @function getEntriesLocalStorage
+  @desc   Haal de entries, met naam en score, uit de local storage van de webbrowser 
+          en vul met de waarden de variabele entriesScoreboard. De entries uit de local storage worden omgezet
+          in een object EntryScore
+  @param  {array} filteredKeysLocalStorage - Een array met keys (mits aanwezig in local storage): placeThree, placeTwo, placeOne
+  @return {map} Een Map object met alle entries die bij de keys horen
   */
 function entriesLocalStorage(filteredKeys) { 
 	let entries = new Map();
@@ -83,11 +72,11 @@ function entriesLocalStorage(filteredKeys) {
 }	
 	
 
-
 /**
-  @function addEntriesToLocalStorage() -> void
-  @desc voeg de key/value paren van de map entriesScoreboard toe aan de local storage van de webbrowser,
-  de EntrieScore object worden omgezet naar een string format. 
+  @function addEntriesToLocalStorage
+  @desc  Voeg de key/value paren van de map entriesScoreboard toe aan de local storage van de webbrowser,
+         het entryScore object worden omgezet naar een string format. 
+  @param {map} Een map die alle informatie van de 3 scorebord omvat
   */
 export function addEntriesToLocalStorage(scoreboard) {
 	let entries = scoreboard

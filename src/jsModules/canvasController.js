@@ -1,30 +1,18 @@
-/** @module controller */
+/** @module canvasController */
 
 import * as settings from "./settings.js";
-import {setMaxCoordinates} from "./settings.js";
-import {initSnakeGame, resetSnakeGame, moveSnakeAndResolveCollisions, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
-import {place} from "./snakeGame.js";    
-	
-//Aanvullling Laurens	
-import {resetScore} from "./score.js";	
-import {resetNameWinner} from "./winnaar.js";
 
-
-import {enterWinnerNameTimer} from "./controllerDeux.js";	
-import {resetScoreField} from "./controllerDeux.js";	
-import {removeNameInputFields} from "./controllerDeux.js";	
-import {gewonnen} from "./controllerDeux.js";	
-import {initEntriesScoreBoard} from "./controllerDeux.js";	
-import {setScoreField} from "./controllerDeux.js";  
+import {gewonnen, setScoreField, resetScoreAndAdjustScoreboard} from "./scoreboardController.js"
+import {initSnakeGame, resetSnakeGame, moveSnakeAndResolveCollisions, getSnakeSegments, getFoods, getGameStatus, place} from "./snakeGame.js";
 
 
 var width,                             // breedte van het tekenveld
     height,                            // hoogte van het tekenveld
-
-    snaketimer,
-
+    snaketimer,                        // timer die snakegame controleert
     lastPressedArrowKey = settings.UP; // string van de laatst gedrukte arrow key
 
+
+//eventlisteners voor het indrukken van de arrowkeys
 $(document).keydown(function (e) {
   switch (e.code) {
     case "ArrowLeft":
@@ -42,12 +30,15 @@ $(document).keydown(function (e) {
   }
 });
 
+
+//uit te voeren acties wanneer de webpagina volledig is geladen
 $(document).ready(function () {
   getDimensionsCanvas();
-  setMaxCoordinates(width, height);
+  settings.setMaxCoordinates(width, height);
   $("#stopSnake").click(stop);
   $("#startSnake").click(start);
 });
+
 
 /**
   @function getDimensionsCanvas
@@ -59,6 +50,7 @@ function getDimensionsCanvas() {
   height = $("#mySnakeCanvas").innerHeight();
 }
 
+
 /**
   @function stop
   @desc Maak het canvas leeg, stop de timer en reset het spel
@@ -69,32 +61,20 @@ function stop() {
   resetSnakeGame(); 
 }
 
+
 /**
   @function start
-  @desc Start het spel, initialiseer het scorebord en start de timer
-        van het spel
+  @desc Start het spel, initialiseer het scorebord, teken het begin van het spel
+        op het canavs en start de timer van het spel
 */
 function start() {
   initSnakeGame();
-
-  //functie kan mogelijks in controllerDeux worden geplaatst
   resetScoreAndAdjustScoreboard();
-
   draw();
   snaketimer = setInterval(function() {
     updateGameAndViewer();}, settings.SLEEPTIME); 
 }
 
-function resetScoreAndAdjustScoreboard() {$
-   //Aanvulling Laurens
-  resetScore();
-  resetScoreField();
-  removeNameInputFields();
-  resetNameWinner();
-  clearInterval(enterWinnerNameTimer);
-  initEntriesScoreBoard();
-  //Aanvulling Laurens
-}
 
 /**
   @function updateGameAndViewer
@@ -109,10 +89,11 @@ function updateGameAndViewer() {
   setScoreField();
 }
 
+
 /**
   @function determineResult
   @desc Bepaal de uitkomst van het spel bij winst of verlies en pas 
-        de viewer hierop aan
+        de viewer hierop aan, doe niks indien geen winst of verlies
 */
 function determineResult(){
   let status = getGameStatus();
@@ -121,13 +102,16 @@ function determineResult(){
       stop();
       drawGewonnen();
       gewonnen(place);
+      lastPressedArrowKey = settings.UP;
       break;
     case settings.LOST:
       stop();
       drawVerloren();
+      lastPressedArrowKey = settings.UP;
       break;
   }
 }
+
 
 /**
   @function draw
@@ -138,6 +122,7 @@ function draw() {
   drawElements(getSnakeSegments(), canvas);
   drawElements(getFoods(), canvas);
 }
+
 
 /**
   @function drawElements
@@ -150,6 +135,7 @@ function drawElements(elements, canvas) {
     drawElement(element, canvas);
   });
 }
+
 
 /**
   @function drawElement
@@ -167,6 +153,7 @@ function drawElements(elements, canvas) {
   });
 }
 
+
 /**
   @function drawVerloren
   @desc Teken een afbeelding op het canvas dat aangeeft dat gebruiker is verloren
@@ -178,6 +165,7 @@ function drawVerloren() {
     scale : 0.5
   });
 }
+
 
 /**
   @function drawGewonnen

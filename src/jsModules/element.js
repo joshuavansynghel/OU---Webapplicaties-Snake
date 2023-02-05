@@ -14,6 +14,7 @@ export function Element(radius, x, y, color) {
   this.color = color;
 }
 
+
 /**
   @function collidesWithOneOf
   @desc   Geeft aan of dit element botst met een ander element uit de array

@@ -1,34 +1,34 @@
 /** @module settings */
 
-export const R        = 10,          // straal van een element
-             STEP     = 2*R,         // stapgrootte
-                                     // er moet gelden: WIDTH = HEIGHT
-             LEFT     = "left",      // bewegingsrichtingen 
+export const R        = 10,            // straal van een element
+             STEP     = 2*R,           // stapgrootte
+                                       // er moet gelden: WIDTH = HEIGHT
+             LEFT     = "left",        // bewegingsrichtingen 
              RIGHT    = "right",
              UP       = "up",
              DOWN     = "down",
 
-             ACTIVE   = "active",
+             ACTIVE   = "active",      // statussen van het spel
              INACTIVE = "inactive",
              WON      = "won",
              LOST     = "lost",
 
 
-             NUMFOODS = 30,          // aantal voedselelementen 
+             NUMFOODS = 5,            // aantal voedselelementen 
 
-             XMIN     = R,           // minimale x waarde
-             YMIN     = R,           // minimale y waarde
+             XMIN     = R,             // minimale x waarde
+             YMIN     = R,             // minimale y waarde
       
-             SLEEPTIME = 200,        // aantal milliseconde voor de timer
+             SLEEPTIME = 200,          // aantal milliseconde voor de timer
 
-             SNAKE   = "DarkRed",    // kleur van een slangsegment
-             FOOD    = "Olive",      // kleur van voedsel
-             HEAD    = "DarkOrange", // kleur van de kop van de slang
+             SNAKE   = "DarkRed",      // kleur van een slangsegment
+             FOOD    = "Olive",        // kleur van voedsel
+             HEAD    = "DarkOrange",   // kleur van de kop van de slang
 
-             WAITFORNAMEWINNER = 1000;
+             WAITFORNAMEWINNER = 1000; // timer om input winnaar te controleren
 
-export var   xMax,
-             yMax;
+export var   xMax,                     // maximale x positie die element mag hebben
+             yMax;                     // maximale y positie die element mag hebben
 
 /**
   @function setMaxCoordinates

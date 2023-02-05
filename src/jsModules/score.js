@@ -1,10 +1,12 @@
-var score = 0; 
+/** @module score */
+
+var score = 0;          // de huidige score van het spel
 
 
 /**
-  @function  setScore(newScore) -> void
-  @desc pas de score aan 
-  @param {string} newScore de nieuwe waarde van de score
+  @function setScore
+  @desc Pas de score aan naar een gegeven waarde
+  @param {string} newScore - De nieuwe waarde van de score
   */	
 export function setScore(newScore){
 	score = newScore;
@@ -12,9 +14,9 @@ export function setScore(newScore){
 
 
 /**
-  @function getScore() -> string
-  @desc geeft de huidige score van het spel
-  @return {string} score de huidige score van het spel
+  @function getScore
+  @desc Geef de huidige score van het spel
+  @return {string} De huidige score van het spel
   */	
 export function getScore() { 
 	return score; 
@@ -22,8 +24,8 @@ export function getScore() {
 
 
 /**
-  @function changeScore() -> void
-  @desc veranderd de score met 10 punten
+  @function changeScore
+  @desc Incrementeer de score met 10
   */	
 export function changeScore() { 
 	score = score + 10;
@@ -31,10 +33,9 @@ export function changeScore() {
 
 
 /**
-  @function resetScore() -> void
-  @desc reset de score van het spel naar 0
+  @function resetScore
+  @desc Reset de score van het spel naar 0
   */		
 export function resetScore() { 
 	score = 0;
 } 
-
