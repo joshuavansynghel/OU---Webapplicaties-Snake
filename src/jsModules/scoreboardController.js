@@ -100,7 +100,6 @@ function initEntriesScoreBoard() {
 */	
 function assignScoreBoardToFields() { 
 	let entries = getEntriesScoreBoard();
-	console.log(entries);
 	entries.forEach((entryScore, key) => { ; 
 		switch (key) {
 		case "placeOne": 

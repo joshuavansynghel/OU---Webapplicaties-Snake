@@ -5,7 +5,7 @@ import {Element} from "./element.js";
 import {createStartSnake, createHead} from "./snake.js";
 import {createFoods} from "./food.js";
 import {changeScore} from "./score.js";
-import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
+import {scoreIsNewHigh}  from "./entriesScoreboard.js";
 
 
 var snake,                              // de slang
@@ -110,10 +110,14 @@ export function moveSnakeAndResolveCollisions(lastPressedArrowKey) {
 */
 function resolveCollisionsAndUpdateGame(newHead) {
   if (!newHead.collidesWithOneOf(snake.segments)) {
+    //beweeg de slang indien die niet botst met zichzelf
     moveSnakeAndEatFood(newHead, newHead.collidesWithOneOf(foods));
-  } 
-  else if (foods.length = 0) {
-    determineResultGame();
+
+    //het spel is gewonnen indien al het voedsel is opgegeten
+    if (foods.length == 0) {
+      determineResultGame();
+    }
+  // indien slang botst met zichzelf is spel verloren
   } else {
     determineResultGame();
   }

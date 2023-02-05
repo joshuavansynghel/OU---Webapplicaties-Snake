@@ -102,10 +102,12 @@ function determineResult(){
       stop();
       drawGewonnen();
       gewonnen(place);
+      lastPressedArrowKey = settings.UP;
       break;
     case settings.LOST:
       stop();
       drawVerloren();
+      lastPressedArrowKey = settings.UP;
       break;
   }
 }
