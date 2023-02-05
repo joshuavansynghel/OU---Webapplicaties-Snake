@@ -1,13 +1,15 @@
 /** @module food */
 
 import * as settings from "./settings.js";
+
 import {Element} from "./element.js";
 
+  
 /**
   @function createFoods
   @desc   Creëert een array van foodelementen die niet botst met bestaande slang
   @param  {Object} snake - De slang van het spel
-  @return {array} foods - Een array van foodelementen
+  @return {array} Een array van foodelementen
 */
 export function createFoods(snake) {   
   var  i = 0,    
@@ -24,6 +26,7 @@ export function createFoods(snake) {
   return foods;  
 }
 
+
 /**
   @function createFood
   @desc    Creëert een food element met gegeven coördinaten
@@ -34,6 +37,7 @@ export function createFoods(snake) {
 function createFood(x, y) {
   return new Element(settings.R, x, y, settings.FOOD);
 }
+
 
 /**
   @function getRandomMultipeOfRadius
@@ -52,6 +56,7 @@ function getRandomMultipleOfRadius(min, max) {
   res = getRandomInt(min, Math.floor(max / (2 * settings.R))) * 2 * settings.R;
   return res;
 }
+
 
 /**
   @function getRandomInt
@@ -77,6 +82,7 @@ function getRandomInt(min, max) {
   }
   return res;
 }
+
 
 /**
   @function isPosInteger

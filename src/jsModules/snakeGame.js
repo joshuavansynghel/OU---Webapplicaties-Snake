@@ -4,15 +4,17 @@ import * as settings from "./settings.js";
 import {Element} from "./element.js";
 import {createStartSnake, createHead} from "./snake.js";
 import {createFoods} from "./food.js";
-import {changeScore, setScore} from "./score.js";
+import {changeScore} from "./score.js";
 import {scoreIsNewHigh}  from "./EntriesScoreboard.js";
 
-var snake,
-    foods = [],                        // voedsel voor de slang
-    snaketimer,                        // timer van de snake
+
+var snake,                              // de slang
+    foods = [],                         // voedsel voor de slang
+    snaketimer,                         // timer van de snake
     gameStatus = settings.INACTIVE;     // status van het spel
 
 export var place;
+
 
 /**
   @function getSnakeSegments
@@ -22,6 +24,7 @@ export var place;
 export function getSnakeSegments() {
   return snake.segments;
 }
+
 
 /**
   @function getFoods
@@ -35,11 +38,12 @@ export function getFoods() {
 /**
   @function getGameStatus
   @desc   Geef de status van het spel
-  @return {string} gameStatus - De status van het spel
+  @return {string} De status van het spel
 */
 export function getGameStatus() {
   return gameStatus;
 } 
+
 
 /**
   @function setGameStatus
@@ -50,6 +54,7 @@ export function setGameStatus(status) {
   gameStatus = status;
 } 
 
+
 /**
   @function resetSnakeGame
   @desc Verwijder alle voedselelementen en zet gamestatus op inactief
@@ -58,6 +63,7 @@ export function resetSnakeGame() {
   foods = [];
   gameStatus = settings.INACTIVE
 }
+
 
 /**
   @function initSnakeGame
@@ -71,6 +77,7 @@ export function initSnakeGame() {
     foods = createFoods(snake);
   }
 }
+
 
 /**
   @function moveSnakeAndResolveCollisions
@@ -92,6 +99,7 @@ export function moveSnakeAndResolveCollisions(lastPressedArrowKey) {
   resolveCollisionsAndUpdateGame(newHead);
 }
 
+
 /**
   @function resolveCollisionsAndUpdateGame
   @desc  Detecteer alle mogelijke collisions:
@@ -111,6 +119,7 @@ function resolveCollisionsAndUpdateGame(newHead) {
   }
 }
 
+
 /**
   @function determineResultGame
   @desc Bepaal of eindscore een nieuwe highscore is waarbij de speler wint en
@@ -122,6 +131,7 @@ function determineResultGame() {
     setGameStatus(settings.WON); 
   } else {setGameStatus(settings.LOST);}
 } 
+
 
 /**
   @function determineDirection
@@ -135,11 +145,12 @@ function determineDirection(lastPressedArrowKey) {
   }
 } 
 
+
 /**
   @function createNewHead
   @desc   Creëer een nieuw hoofd voor de slang op basis van de huidige richting
           van de slang
-  @return {Element} Element met straal R en color HEAD
+  @return {Object} Element met straal R en color HEAD
 */
 export function createNewHead() {
   let currentHead = snake.segments.at(-1);
@@ -163,6 +174,7 @@ export function createNewHead() {
   return newHead;
 }
 
+
 /**
   @function oppositeDirectionSnake
   @desc   Geef aan of de huidige richting van de slang tegenovergesteld is
@@ -179,6 +191,7 @@ function oppositeDirectionSnake(lastPressedArrowKey) {
          (snake.getDirection() == settings.RIGHT && lastPressedArrowKey == settings.LEFT);
 }
 
+
 /**
   @function elementOutOfBounds
   @desc   Geef aan of het element buiten het canvas valt
@@ -192,11 +205,12 @@ function elementOutOfBounds(element) {
          element.y < settings.YMIN || element.y > settings.yMax;
 }
 
+
 /**
   @function refitNewHeadToCanvas
   @desc Pas de x of y coordinaat van het nieuwe hoofd aan
         zodat deze weer binnen het canvas valt
-  @param {Element} element - Het te wijzigen element
+  @param {Object} element - Het te wijzigen element
 */
 function refitNewHeadToCanvas(element) {
   switch (snake.getDirection()) {
@@ -215,11 +229,12 @@ function refitNewHeadToCanvas(element) {
   }
 }
 
+
 /**
   @function moveSnakeAndEatFood
   @desc  Past coordinaten van de slang en reageer indien deze
          met voedsel botst
-  @param {Element} newHead - Het nieuwe hoofd van de slang
+  @param {Object} newHead - Het nieuwe hoofd van de slang
   @param {boolean} foodCollision false bij botsing nieuwe head met voedsel
                                  anders true
 */
@@ -237,6 +252,7 @@ function moveSnakeAndEatFood(newHead, foodCollision) {
     changeScore();
   }
 }
+
 
 /**
   @function removeFood

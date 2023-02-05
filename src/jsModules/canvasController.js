@@ -1,15 +1,9 @@
 /** @module canvasController */
 
 import * as settings from "./settings.js";
-import {place} from "./snakeGame.js";
-import {setMaxCoordinates} from "./settings.js";
-/**
-import {resetScore} from "./score.js";  
-import {resetNameWinner} from "./winnaar.js";
-import {enterWinnerNameTimer, resetScoreField, removeNameInputFields, gewonnen, initEntriesScoreBoard, setScoreField} from "./controllerDeux.js"; 
-*/
-import {enterWinnerNameTimer, gewonnen, setScoreField, resetScoreAndAdjustScoreboard} from "./scoreboardController.js"
-import {initSnakeGame, resetSnakeGame, moveSnakeAndResolveCollisions, getSnakeSegments, getFoods, getGameStatus} from "./snakeGame.js";
+
+import {gewonnen, setScoreField, resetScoreAndAdjustScoreboard} from "./scoreboardController.js"
+import {initSnakeGame, resetSnakeGame, moveSnakeAndResolveCollisions, getSnakeSegments, getFoods, getGameStatus, place} from "./snakeGame.js";
 
 
 var width,                             // breedte van het tekenveld
@@ -40,7 +34,7 @@ $(document).keydown(function (e) {
 //uit te voeren acties wanneer de webpagina volledig is geladen
 $(document).ready(function () {
   getDimensionsCanvas();
-  setMaxCoordinates(width, height);
+  settings.setMaxCoordinates(width, height);
   $("#stopSnake").click(stop);
   $("#startSnake").click(start);
 });
@@ -99,7 +93,7 @@ function updateGameAndViewer() {
 /**
   @function determineResult
   @desc Bepaal de uitkomst van het spel bij winst of verlies en pas 
-        de viewer hierop aan
+        de viewer hierop aan, doe niks indien geen winst of verlies
 */
 function determineResult(){
   let status = getGameStatus();

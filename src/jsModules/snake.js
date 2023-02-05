@@ -16,7 +16,7 @@ function Snake(segments) {
 /**
   @function getDirection
   @desc   Geef de huidige richting van de slang
-  @return {string} direction - De huidige  richting van de slang
+  @return {string} De huidige  richting van de slang
 */
 Snake.prototype.getDirection = function() {
   return this.direction;
