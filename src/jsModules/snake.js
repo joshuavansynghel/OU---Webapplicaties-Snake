@@ -1,4 +1,4 @@
-/** @module food */
+/** @module snake */
 
 import * as settings from "./settings.js";
 import {Element} from "./element.js";

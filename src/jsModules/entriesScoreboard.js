@@ -7,7 +7,7 @@ var entriesScoreboard;              // het scorebord met de 3 highscores
 	
 
 /**
-  @construcor EntryScore
+  @constructor EntryScore
   @desc  Creëer een entry voor het scoreboard
   @param {string} name - De naam van de winnaar
   @param {string} scored - De score van de winnaar 
